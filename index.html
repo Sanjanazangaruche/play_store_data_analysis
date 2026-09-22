@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elevance Skills - Complete Analytics & Visualization Portfolio</title>
+    <!-- Plotly CDN -->
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0b0f19;
+            --bg-secondary: #111827;
+            --bg-card: #1e293b;
+            --border-color: #334155;
+            --accent-cyan: #06b6d4;
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --accent-pink: #ec4899;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            line-height: 1.6;
+            scroll-behavior: smooth;
+        }
+        /* Header & Hero */
+        header {
+            background: linear-gradient(135deg, rgba(17, 24, 39, 0.95), rgba(15, 23, 42, 0.95));
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+        }
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: #fff;
+        }
+        .brand-logo {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 20px;
+        }
+        .brand-text h1 {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        .brand-text p {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .nav-links {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 4px 0;
+        }
+        .nav-btn {
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: all 0.2s;
+            white-space: nowrap;
+            background: transparent;
+            border: 1px solid transparent;
+        }
+        .nav-btn:hover, .nav-btn.active {
+            color: #fff;
+            background: rgba(59, 130, 246, 0.15);
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+        /* Hero Section */
+        .hero {
+            padding: 50px 24px 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            border-radius: 9999px;
+            background: rgba(6, 182, 212, 0.1);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            color: var(--accent-cyan);
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        .hero h2 {
+            font-size: 42px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero p {
+            font-size: 17px;
+            color: var(--text-muted);
+            max-width: 840px;
+            margin: 0 auto 30px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            max-width: 1100px;
+            margin: 0 auto 40px;
+        }
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--accent-cyan);
+            margin-bottom: 4px;
+        }
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 24px 80px;
+        }
+        /* Section Cards */
+        .task-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 40px;
+            scroll-margin-top: 90px;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .section-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .task-pill {
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 14px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            color: #fff;
+        }
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        .section-desc {
+            color: var(--text-muted);
+            font-size: 15px;
+            margin-top: 6px;
+            max-width: 900px;
+        }
+        .time-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 8px;
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: var(--accent-amber);
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .action-btns {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-primary {
+            background: var(--accent-blue);
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+        .btn-secondary {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+        }
+        .btn-secondary:hover {
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+        /* Plot Container */
+        .chart-box {
+            background: #0f172a;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            min-height: 480px;
+            position: relative;
+        }
+        /* Task 1 Graphs Grid */
+        .graphs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+            margin-top: 24px;
+        }
+        .graph-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .graph-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-blue);
+        }
+        .graph-card h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+        .graph-card p {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            flex-grow: 1;
+        }
+        /* Datasets Table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+            font-size: 14px;
+        }
+        .data-table th, .data-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .data-table th {
+            background: var(--bg-card);
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+        .data-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        /* Footer */
+        footer {
+            border-top: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+            padding: 40px 24px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        /* IST Clock Banner */
+        .clock-banner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            padding: 12px;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+        .clock-time {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="nav-container">
+            <a href="#" class="brand">
+                <div class="brand-logo">ES</div>
+                <div class="brand-text">
+                    <h1>Elevance Skills Analytics</h1>
+                    <p>Sanjana Zangaruche • Complete 7-Task Portfolio</p>
+                </div>
+            </a>
+            <nav class="nav-links">
+                <a href="#task1" class="nav-btn">Task 1: Play Store Dashboard</a>
+                <a href="#task2" class="nav-btn">Task 2: Bubble & Subjectivity</a>
+                <a href="#task3" class="nav-btn">Task 3: Top Categories (>1M)</a>
+                <a href="#task4" class="nav-btn">Task 4: Growth Analysis</a>
+                <a href="#task5" class="nav-btn">Task 5: Cumulative Trend</a>
+                <a href="#task6" class="nav-btn">Task 6: Rating vs Reviews</a>
+                <a href="#task7" class="nav-btn">Task 7: Free vs Paid Matrix</a>
+                <a href="#datasets" class="nav-btn">Datasets</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-badge">
+            <span>✨ Complete Master Project • All 7 Tasks In One Unified Hub</span>
+        </div>
+        <h2>Google Play Store & Healthcare Analytics</h2>
+        <p>A comprehensive end-to-end data engineering, statistical exploration, and interactive visualization portfolio built with Python, Pandas, Plotly, and Matplotlib across 7 specialized analytics modules.</p>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">7</div>
+                <div class="stat-label">Completed Project Tasks</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">10,840+</div>
+                <div class="stat-label">Apps Analyzed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">64,000+</div>
+                <div class="stat-label">User Reviews Processed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">15+</div>
+                <div class="stat-label">Interactive Visualizations</div>
+            </div>
+        </div>
+
+        <div class="clock-banner">
+            <span>🕒 <strong>Indian Standard Time (IST):</strong></span>
+            <span class="clock-time" id="ist-clock">Loading IST...</span>
+            <span style="color: var(--text-muted); font-size: 13px;">(All task time-window restrictions are preview-enabled)</span>
+        </div>
+    </section>
+
+    <!-- Main Content Container -->
+    <main class="container">
+
+        <!-- TASK 1 -->
+        <section id="task1" class="task-section">
+            <div class="section-header">
+                <div>
+                    <div class="section-title-wrap">
+                        <span class="task-pill">TASK 1</span>
+                        <h3 class="section-title">Play Store Review Analytics Dashboard (10 Graphs)</h3>
+                    </div>
+                    <p class="section-desc">Complete exploratory data analysis of 10,000+ Google Play Store applications and user reviews with 10 interactive Plotly visualizations covering category distributions, pricing models, sentiment dynamics, installation scales, and monetization patterns.</p>
+                </div>
+                <div class="action-btns">
+                    <a href="play_store_data/web%20page.html" target="_blank" class="btn btn-primary">Launch Full Dashboard ↗</a>
+                    <a href="https://github.com/Sanjanazangaruche/play_store_data_analysis/tree/development/play_store_data" target="_blank" class="btn btn-secondary">View Folder ↗</a>
+                </div>
+            </div>
+
+            <div class="graphs-grid">
+                <div class="graph-card">
+                    <h4>1. Category Distribution</h4>
+                    <p>Aggregates and visualizes the total volume of applications across all Play Store categories.</p>
+                    <a href="play_store_data/Category%20Graph%201.html" target="_blank" class="btn btn-secondary">View Interactive Graph ↗</a>
+                </div>
+                <div class="graph-card">
+                    <h4>2. Type Distribution (Paid vs Free)</h4>
+                    <p>Donut chart detailing the distribution between free applications and premium paid apps.</p>
+                    <a href="play_store_data/Type%20Graph%202.html" target="_blank" class="btn btn-secondary">View Interactive Graph ↗</a>
+                </div>
+                <div class="graph-card">
+                    <h4>3. Rating Distribution</h4>
+                    <p>Histogram showing app rating frequencies peaking between 4.0 and 4.5 stars.</p>
+                    <a href="play_store_data/Rating%20Graph%203.html" target="_blank" class="btn btn-secondary">View Interactive Graph ↗</a>
+                </div>
+                <div class="graph-card">
+                    <h4>4. Sentiment Distribution</h4>
+                    <p>Polarity and subjectivity sentiment analysis on 64,000+ customer reviews.</p>
+                    <a href="play_store_data/Sentiment%20Graph%204.html" target="_blank" class="btn btn-secondary">View Interactive Graph ↗</a>
+                </div>
+                <div class="graph-card">
+                    <h4>5. Installs by Category</h4>
+                    <p>Identifies top-installed domains led by Game, Communication, and Tools.</p>
+                    <a href="play_store_data/Installs%20Graph%205.html" target="_blank" class="btn btn-secondary">View Interactive Graph ↗</a>
+                </div>
+                <div class="graph-card">
+                    <h4>6. Updates Over the Years</h4>
+                    <p>Time-series analysis of application maintenance frequency and lifecycle updates.</p>
+                    <a href="play_store_data/Updates%20Graph%206.html" target="_blank" class="btn btn-secondary">View Interactive Graph ↗</a>
+                </div>
+                <div class="graph-card">
+                    <h4>7. Revenue by Category</h4>
+                    <p>Estimated revenue analysis across top categories through pricing and install metrics.</p>
+                    <a href="play_store_data/Revenue%20Graph%207.html" target="_blank" class="btn btn-secondary">View Interactive Graph ↗</a>
+                </div>
+                <div class="graph-card">
+                    <h4>8. Top App Genres</h4>
+                    <p>Breakdown of granular genre classifications within primary application categories.</p>
+                    <a href="play_store_data/Genre%20Graph%208.html" target="_blank" class="btn btn-secondary">View Interactive Graph ↗</a>
+                </div>
+                <div class="graph-card">
+                    <h4>9. Last Update vs Rating</h4>
+                    <p>Scatter plot measuring correlation between update freshness and user satisfaction.</p>
+                    <a href="play_store_data/Update%20Graph%209.html" target="_blank" class="btn btn-secondary">View Interactive Graph ↗</a>
+                </div>
+                <div class="graph-card">
+                    <h4>10. Rating for Paid vs Free</h4>
+                    <p>Box plot statistical comparison proving paid apps maintain slightly higher median ratings.</p>
+                    <a href="play_store_data/Paid%20Free%20Graph%2010.html" target="_blank" class="btn btn-secondary">View Interactive Graph ↗</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- TASK 2 -->
+        <section id="task2" class="task-section">
+            <div class="section-header">
+                <div>
+                    <div class="section-title-wrap">
+                        <span class="task-pill" style="background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));">TASK 2</span>
+                        <h3 class="section-title">Advanced Bubble Chart & Review Sentiment Subjectivity</h3>
+                    </div>
+                    <p class="section-desc">Filters apps with Rating > 3.5, Reviews > 500, Installs > 50,000, App name without 'S', and Subjectivity > 0.5. Features multilingual translations (Hindi: सौंदर्य, Tamil: வணிகம், German: Partnersuche) with pink highlighting for Game apps.</p>
+                </div>
+                <div class="action-btns">
+                    <span class="time-badge">⏰ Time Window: 5:00 PM – 7:00 PM IST</span>
+                    <a href="taks2/web%20page.html" target="_blank" class="btn btn-secondary">Task 2 Standalone Page ↗</a>
+                    <a href="https://github.com/Sanjanazangaruche/play_store_data_analysis/blob/development/taks2/tut2.ipynb" target="_blank" class="btn btn-secondary">tut2.ipynb ↗</a>
+                </div>
+            </div>
+            <div class="chart-box" id="chart-task2"></div>
+        </section>
+
+        <!-- TASK 3 -->
+        <section id="task3" class="task-section">
+            <div class="section-header">
+                <div>
+                    <div class="section-title-wrap">
+                        <span class="task-pill" style="background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));">TASK 3</span>
+                        <h3 class="section-title">Top 5 Categories by Installs with >1M Highlighting</h3>
+                    </div>
+                    <p class="section-desc">Excludes categories starting with A, C, G, S, aggregates total installs, and highlights categories exceeding the 1 Million install milestone.</p>
+                </div>
+                <div class="action-btns">
+                    <span class="time-badge">⏰ Time Window: 6:00 PM – 8:00 PM IST</span>
+                    <a href="https://github.com/Sanjanazangaruche/play_store_data_analysis/blob/development/task3/tut9.ipynb" target="_blank" class="btn btn-secondary">tut9.ipynb ↗</a>
+                </div>
+            </div>
+            <div class="chart-box" id="chart-task3"></div>
+        </section>
+
+        <!-- TASK 4 -->
+        <section id="task4" class="task-section">
+            <div class="section-header">
+                <div>
+                    <div class="section-title-wrap">
+                        <span class="task-pill" style="background: linear-gradient(135deg, var(--accent-green), var(--accent-cyan));">TASK 4</span>
+                        <h3 class="section-title">Month-over-Month Installation Growth Analysis</h3>
+                    </div>
+                    <p class="section-desc">Analyzes monthly install trajectories for categories starting with E, C, B, excluding apps starting with X, Y, Z or containing S, calculating month-over-month growth and shading periods with >20% growth.</p>
+                </div>
+                <div class="action-btns">
+                    <span class="time-badge">⏰ Time Window: 6:00 PM – 9:00 PM IST</span>
+                    <a href="https://github.com/Sanjanazangaruche/play_store_data_analysis/blob/development/task4/tut10.ipynb" target="_blank" class="btn btn-secondary">tut10.ipynb ↗</a>
+                </div>
+            </div>
+            <div class="chart-box" id="chart-task4"></div>
+        </section>
+
+        <!-- TASK 5 -->
+        <section id="task5" class="task-section">
+            <div class="section-header">
+                <div>
+                    <div class="section-title-wrap">
+                        <span class="task-pill" style="background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));">TASK 5</span>
+                        <h3 class="section-title">Cumulative Installs Over Time by App Category</h3>
+                    </div>
+                    <p class="section-desc">Tracks cumulative install curves across localized categories: Voyages et local (French), Productividad (Spanish), and 写真 (Japanese), identifying periods with >25% rapid expansion.</p>
+                </div>
+                <div class="action-btns">
+                    <span class="time-badge">⏰ Time Window: 4:00 PM – 6:00 PM IST</span>
+                    <a href="https://github.com/Sanjanazangaruche/play_store_data_analysis/blob/development/task5/tut11.ipynb" target="_blank" class="btn btn-secondary">tut11.ipynb ↗</a>
+                </div>
+            </div>
+            <div class="chart-box" id="chart-task5"></div>
+        </section>
+
+        <!-- TASK 6 -->
+        <section id="task6" class="task-section">
+            <div class="section-header">
+                <div>
+                    <div class="section-title-wrap">
+                        <span class="task-pill" style="background: linear-gradient(135deg, var(--accent-amber), var(--accent-green));">TASK 6</span>
+                        <h3 class="section-title">Average Rating & Total Reviews (Top 10 by Installs)</h3>
+                    </div>
+                    <p class="section-desc">Focuses on lightweight apps (<10 MB) with high user satisfaction (Rating >= 4.0), contrasting Average Star Ratings with Review volume in Millions across leading categories.</p>
+                </div>
+                <div class="action-btns">
+                    <span class="time-badge">⏰ Time Window: 3:00 PM – 5:00 PM IST</span>
+                    <a href="https://github.com/Sanjanazangaruche/play_store_data_analysis/blob/development/task6/tut12.ipynb" target="_blank" class="btn btn-secondary">tut12.ipynb ↗</a>
+                </div>
+            </div>
+            <div class="chart-box" id="chart-task6"></div>
+        </section>
+
+        <!-- TASK 7 -->
+        <section id="task7" class="task-section">
+            <div class="section-header">
+                <div>
+                    <div class="section-title-wrap">
+                        <span class="task-pill" style="background: linear-gradient(135deg, #f43f5e, #fb923c);">TASK 7</span>
+                        <h3 class="section-title">Segmented Monetization & Installation Matrix</h3>
+                    </div>
+                    <p class="section-desc">Filters high-volume, established applications (Installs >= 10K, Android > 4.0, Size > 15 MB, Content Rating 'Everyone', Title <= 30 chars), comparing average installs and revenue across Free vs Paid tiers.</p>
+                </div>
+                <div class="action-btns">
+                    <span class="time-badge">⏰ Time Window: 1:00 PM – 2:00 PM IST</span>
+                    <a href="https://github.com/Sanjanazangaruche/play_store_data_analysis/blob/development/task7/tut13.ipynb" target="_blank" class="btn btn-secondary">tut13.ipynb ↗</a>
+                </div>
+            </div>
+            <div class="chart-box" id="chart-task7"></div>
+        </section>
+
+        <!-- DATASETS & RESOURCES -->
+        <section id="datasets" class="task-section">
+            <div class="section-header">
+                <div>
+                    <div class="section-title-wrap">
+                        <span class="task-pill" style="background: #475569;">RESOURCES</span>
+                        <h3 class="section-title">Project Datasets & Repository Assets</h3>
+                    </div>
+                    <p class="section-desc">Direct access to all raw datasets, clean CSV files, and Python dependencies utilised throughout this Elevance Skills analytics program.</p>
+                </div>
+                <div class="action-btns">
+                    <a href="https://github.com/Sanjanazangaruche/play_store_data_analysis" target="_blank" class="btn btn-secondary">GitHub Repository ↗</a>
+                </div>
+            </div>
+
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Asset Name</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>apps.csv</strong></td>
+                        <td>CSV Dataset</td>
+                        <td>10,840 Play Store applications with rating, reviews, size, installs, price, and category metadata.</td>
+                        <td><a href="play_store_data/apps.csv" class="btn btn-secondary" style="padding: 4px 10px; font-size: 12px;">Download CSV</a></td>
+                    </tr>
+                    <tr>
+                        <td><strong>user_reviews.csv</strong></td>
+                        <td>CSV Dataset</td>
+                        <td>64,000+ translated user reviews with polarity and subjectivity sentiment scores.</td>
+                        <td><a href="play_store_data/user_reviews.csv" class="btn btn-secondary" style="padding: 4px 10px; font-size: 12px;">Download CSV</a></td>
+                    </tr>
+                    <tr>
+                        <td><strong>heart-disease.csv</strong></td>
+                        <td>CSV Dataset</td>
+                        <td>Healthcare diagnostic dataset utilized for biomedical predictive analysis.</td>
+                        <td><a href="heart-disease.csv" class="btn btn-secondary" style="padding: 4px 10px; font-size: 12px;">Download CSV</a></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Global EV Data 2024 (1).csv</strong></td>
+                        <td>CSV Dataset</td>
+                        <td>Global electric vehicle adoption metrics across countries and transportation categories.</td>
+                        <td><a href="Global%20EV%20Data%202024%20(1).csv" class="btn btn-secondary" style="padding: 4px 10px; font-size: 12px;">Download CSV</a></td>
+                    </tr>
+                    <tr>
+                        <td><strong>requirement.txt</strong></td>
+                        <td>Dependencies</td>
+                        <td>Python packages: pandas, numpy, plotly, textblob, matplotlib, seaborn, pytz, scikit-learn.</td>
+                        <td><a href="requirement.txt" class="btn btn-secondary" style="padding: 4px 10px; font-size: 12px;">View Requirements</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p><strong>Elevance Skills Data Analytics & Visualization Capstone</strong></p>
+        <p style="margin-top: 6px; color: #64748b;">Designed & Developed by Sanjana Zangaruche • Deployed on Cloud via GitHub Pages</p>
+    </footer>
+
+    <!-- Interactive Charts Script -->
+    <script>
+        // Real-time IST Clock
+        function updateISTClock() {
+            const now = new Date();
+            const istTime = new Intl.DateTimeFormat('en-US', {
+                timeZone: 'Asia/Kolkata',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            }).format(now);
+            const el = document.getElementById('ist-clock');
+            if (el) el.innerText = istTime + ' IST';
+        }
+        setInterval(updateISTClock, 1000);
+        updateISTClock();
+
+        // Data Payloads
+        const task2Data = [{"App": "Google Primer", "Graph_Category": "வணிகம் (Business)", "Rating": 4.4, "Reviews": 62272, "Installs": 10000000, "Size_MB": 18.0, "Sentiment_Subjectivity": 0.68}, {"App": "Call Blocker", "Graph_Category": "வணிகம் (Business)", "Rating": 4.6, "Reviews": 188841, "Installs": 5000000, "Size_MB": 3.2, "Sentiment_Subjectivity": 0.66}, {"App": "CallApp: Caller ID, Blocker & Phone Call Recorder", "Graph_Category": "Communication", "Rating": 4.4, "Reviews": 483565, "Installs": 10000000, "Size_MB": 20.0, "Sentiment_Subjectivity": 0.51}, {"App": "Caller ID +", "Graph_Category": "Communication", "Rating": 4.0, "Reviews": 9498, "Installs": 1000000, "Size_MB": 0.1, "Sentiment_Subjectivity": 0.6}, {"App": "Hily: Dating, Chat, Match, Meet & Hook up", "Graph_Category": "Partnersuche (Dating)", "Rating": 4.1, "Reviews": 2556, "Installs": 100000, "Size_MB": 56.0, "Sentiment_Subjectivity": 0.56}, {"App": "CMB Free Dating App", "Graph_Category": "Partnersuche (Dating)", "Rating": 4.0, "Reviews": 48845, "Installs": 1000000, "Size_MB": 40.0, "Sentiment_Subjectivity": 0.54}, {"App": "FlirtChat - ♥Free Dating/Flirting App♥", "Graph_Category": "Partnersuche (Dating)", "Rating": 4.3, "Reviews": 2430, "Installs": 500000, "Size_MB": 13.0, "Sentiment_Subjectivity": 0.51}, {"App": "Hitwe - meet people and chat", "Graph_Category": "Partnersuche (Dating)", "Rating": 4.2, "Reviews": 243950, "Installs": 10000000, "Size_MB": 21.0, "Sentiment_Subjectivity": 0.69}, {"App": "2Date Dating App, Love and matching", "Graph_Category": "Partnersuche (Dating)", "Rating": 4.4, "Reviews": 41605, "Installs": 500000, "Size_MB": 8.1, "Sentiment_Subjectivity": 0.56}, {"App": "Amazon Prime Video", "Graph_Category": "Entertainment", "Rating": 4.2, "Reviews": 411683, "Installs": 50000000, "Size_MB": 24.0, "Sentiment_Subjectivity": 0.56}, {"App": "Cooking Channel", "Graph_Category": "Entertainment", "Rating": 4.1, "Reviews": 1033, "Installs": 100000, "Size_MB": 16.0, "Sentiment_Subjectivity": 0.53}, {"App": "Block Puzzle", "Graph_Category": "Game", "Rating": 4.6, "Reviews": 59800, "Installs": 5000000, "Size_MB": 7.8, "Sentiment_Subjectivity": 0.54}, {"App": "Granny", "Graph_Category": "Game", "Rating": 4.5, "Reviews": 1135631, "Installs": 50000000, "Size_MB": 59.0, "Sentiment_Subjectivity": 0.56}, {"App": "Flow Free", "Graph_Category": "Game", "Rating": 4.3, "Reviews": 1295557, "Installs": 100000000, "Size_MB": 11.0, "Sentiment_Subjectivity": 0.52}, {"App": "Cut the Rope FULL FREE", "Graph_Category": "Game", "Rating": 4.4, "Reviews": 2123381, "Installs": 100000000, "Size_MB": 49.0, "Sentiment_Subjectivity": 0.57}, {"App": "Color by Number – New Coloring Book", "Graph_Category": "Game", "Rating": 4.7, "Reviews": 141529, "Installs": 5000000, "Size_MB": 24.0, "Sentiment_Subjectivity": 0.54}, {"App": "Draw In", "Graph_Category": "Game", "Rating": 4.2, "Reviews": 46416, "Installs": 10000000, "Size_MB": 73.0, "Sentiment_Subjectivity": 0.58}, {"App": "Honkai Impact 3rd", "Graph_Category": "Game", "Rating": 4.7, "Reviews": 59017, "Installs": 1000000, "Size_MB": 82.0, "Sentiment_Subjectivity": 0.52}, {"App": "Dude Perfect 2", "Graph_Category": "Game", "Rating": 4.5, "Reviews": 401425, "Installs": 10000000, "Size_MB": 70.0, "Sentiment_Subjectivity": 0.54}, {"App": "Candy Bomb", "Graph_Category": "Game", "Rating": 4.4, "Reviews": 42145, "Installs": 10000000, "Size_MB": 20.0, "Sentiment_Subjectivity": 0.61}, {"App": "1LINE – One Line with One Touch", "Graph_Category": "Game", "Rating": 4.6, "Reviews": 214878, "Installs": 10000000, "Size_MB": 10.0, "Sentiment_Subjectivity": 0.56}, {"App": "Blogger", "Graph_Category": "Social", "Rating": 3.7, "Reviews": 138026, "Installs": 5000000, "Size_MB": 2.7, "Sentiment_Subjectivity": 0.52}, {"App": "Four In A Line", "Graph_Category": "Game", "Rating": 3.8, "Reviews": 22191, "Installs": 1000000, "Size_MB": 3.0, "Sentiment_Subjectivity": 0.55}];
+        const task3Data = [{"Category": "TOOLS", "Installs": 8001771915, "Highlight": "Above 1 Million"}, {"Category": "PRODUCTIVITY", "Installs": 5793091369, "Highlight": "Above 1 Million"}, {"Category": "PHOTOGRAPHY", "Installs": 4649147655, "Highlight": "Above 1 Million"}, {"Category": "FAMILY", "Installs": 4427941505, "Highlight": "Above 1 Million"}, {"Category": "VIDEO_PLAYERS", "Installs": 3926902720, "Highlight": "Above 1 Million"}];
+        const task4Data = [{"Month": "2014-10", "Graph_Category": "Books_And_Reference", "Installs": 500000, "Month_str": "2014-10", "Prev_Installs": 0.0, "Growth_Percentage": 0.0}, {"Month": "2014-11", "Graph_Category": "Books_And_Reference", "Installs": 5000000, "Month_str": "2014-11", "Prev_Installs": 500000.0, "Growth_Percentage": 900.0}, {"Month": "2015-07", "Graph_Category": "Books_And_Reference", "Installs": 10000000, "Month_str": "2015-07", "Prev_Installs": 5000000.0, "Growth_Percentage": 100.0}, {"Month": "2016-06", "Graph_Category": "Books_And_Reference", "Installs": 60000, "Month_str": "2016-06", "Prev_Installs": 10000000.0, "Growth_Percentage": -99.4}, {"Month": "2016-08", "Graph_Category": "Books_And_Reference", "Installs": 100000, "Month_str": "2016-08", "Prev_Installs": 60000.0, "Growth_Percentage": 66.66666666666666}, {"Month": "2017-02", "Graph_Category": "Books_And_Reference", "Installs": 100000, "Month_str": "2017-02", "Prev_Installs": 100000.0, "Growth_Percentage": 0.0}, {"Month": "2017-04", "Graph_Category": "Books_And_Reference", "Installs": 1000000, "Month_str": "2017-04", "Prev_Installs": 100000.0, "Growth_Percentage": 900.0}, {"Month": "2017-05", "Graph_Category": "Books_And_Reference", "Installs": 100000, "Month_str": "2017-05", "Prev_Installs": 1000000.0, "Growth_Percentage": -90.0}, {"Month": "2017-07", "Graph_Category": "Books_And_Reference", "Installs": 100000, "Month_str": "2017-07", "Prev_Installs": 100000.0, "Growth_Percentage": 0.0}, {"Month": "2017-08", "Graph_Category": "Books_And_Reference", "Installs": 10010000, "Month_str": "2017-08", "Prev_Installs": 100000.0, "Growth_Percentage": 9910.0}, {"Month": "2017-11", "Graph_Category": "Books_And_Reference", "Installs": 2000000, "Month_str": "2017-11", "Prev_Installs": 10010000.0, "Growth_Percentage": -80.01998001998003}, {"Month": "2018-04", "Graph_Category": "Books_And_Reference", "Installs": 1050000, "Month_str": "2018-04", "Prev_Installs": 2000000.0, "Growth_Percentage": -47.5}, {"Month": "2018-05", "Graph_Category": "Books_And_Reference", "Installs": 40600000, "Month_str": "2018-05", "Prev_Installs": 1050000.0, "Growth_Percentage": 3766.6666666666665}, {"Month": "2018-06", "Graph_Category": "Books_And_Reference", "Installs": 47100000, "Month_str": "2018-06", "Prev_Installs": 40600000.0, "Growth_Percentage": 16.00985221674877}, {"Month": "2018-07", "Graph_Category": "Books_And_Reference", "Installs": 101600000, "Month_str": "2018-07", "Prev_Installs": 47100000.0, "Growth_Percentage": 115.71125265392782}, {"Month": "2018-08", "Graph_Category": "Books_And_Reference", "Installs": 110050000, "Month_str": "2018-08", "Prev_Installs": 101600000.0, "Growth_Percentage": 8.316929133858268}, {"Month": "2017-03", "Graph_Category": "Comics", "Installs": 100000, "Month_str": "2017-03", "Prev_Installs": 0.0, "Growth_Percentage": 0.0}, {"Month": "2018-05", "Graph_Category": "Comics", "Installs": 100000, "Month_str": "2018-05", "Prev_Installs": 100000.0, "Growth_Percentage": 0.0}, {"Month": "2018-07", "Graph_Category": "Comics", "Installs": 6000000, "Month_str": "2018-07", "Prev_Installs": 100000.0, "Growth_Percentage": 5900.0}, {"Month": "2018-08", "Graph_Category": "Comics", "Installs": 5050000, "Month_str": "2018-08", "Prev_Installs": 6000000.0, "Growth_Percentage": -15.833333333333332}, {"Month": "2014-01", "Graph_Category": "Communication", "Installs": 100000, "Month_str": "2014-01", "Prev_Installs": 0.0, "Growth_Percentage": 0.0}, {"Month": "2014-03", "Graph_Category": "Communication", "Installs": 100000, "Month_str": "2014-03", "Prev_Installs": 100000.0, "Growth_Percentage": 0.0}, {"Month": "2014-07", "Graph_Category": "Communication", "Installs": 10000000, "Month_str": "2014-07", "Prev_Installs": 100000.0, "Growth_Percentage": 9900.0}, {"Month": "2015-03", "Graph_Category": "Communication", "Installs": 1000000, "Month_str": "2015-03", "Prev_Installs": 10000000.0, "Growth_Percentage": -90.0}, {"Month": "2015-08", "Graph_Category": "Communication", "Installs": 2000000, "Month_str": "2015-08", "Prev_Installs": 1000000.0, "Growth_Percentage": 100.0}, {"Month": "2016-06", "Graph_Category": "Communication", "Installs": 1000000, "Month_str": "2016-06", "Prev_Installs": 2000000.0, "Growth_Percentage": -50.0}, {"Month": "2016-07", "Graph_Category": "Communication", "Installs": 110000, "Month_str": "2016-07", "Prev_Installs": 1000000.0, "Growth_Percentage": -89.0}, {"Month": "2016-09", "Graph_Category": "Communication", "Installs": 1000000, "Month_str": "2016-09", "Prev_Installs": 110000.0, "Growth_Percentage": 809.0909090909091}, {"Month": "2016-11", "Graph_Category": "Communication", "Installs": 11000000, "Month_str": "2016-11", "Prev_Installs": 1000000.0, "Growth_Percentage": 1000.0}, {"Month": "2017-04", "Graph_Category": "Communication", "Installs": 100000, "Month_str": "2017-04", "Prev_Installs": 11000000.0, "Growth_Percentage": -99.0909090909091}, {"Month": "2017-09", "Graph_Category": "Communication", "Installs": 50000, "Month_str": "2017-09", "Prev_Installs": 100000.0, "Growth_Percentage": -50.0}, {"Month": "2017-11", "Graph_Category": "Communication", "Installs": 5000000, "Month_str": "2017-11", "Prev_Installs": 50000.0, "Growth_Percentage": 9900.0}, {"Month": "2018-01", "Graph_Category": "Communication", "Installs": 16000000, "Month_str": "2018-01", "Prev_Installs": 5000000.0, "Growth_Percentage": 220.00000000000003}, {"Month": "2018-03", "Graph_Category": "Communication", "Installs": 10100000, "Month_str": "2018-03", "Prev_Installs": 16000000.0, "Growth_Percentage": -36.875}, {"Month": "2018-04", "Graph_Category": "Communication", "Installs": 1000000, "Month_str": "2018-04", "Prev_Installs": 10100000.0, "Growth_Percentage": -90.0990099009901}, {"Month": "2018-05", "Graph_Category": "Communication", "Installs": 5000000, "Month_str": "2018-05", "Prev_Installs": 1000000.0, "Growth_Percentage": 400.0}, {"Month": "2018-06", "Graph_Category": "Communication", "Installs": 11100000, "Month_str": "2018-06", "Prev_Installs": 5000000.0, "Growth_Percentage": 122.0}, {"Month": "2018-07", "Graph_Category": "Communication", "Installs": 315730000, "Month_str": "2018-07", "Prev_Installs": 11100000.0, "Growth_Percentage": 2744.4144144144143}, {"Month": "2018-08", "Graph_Category": "Communication", "Installs": 1298510000, "Month_str": "2018-08", "Prev_Installs": 315730000.0, "Growth_Percentage": 311.2722896145441}, {"Month": "2014-07", "Graph_Category": "Education", "Installs": 10000, "Month_str": "2014-07", "Prev_Installs": 0.0, "Growth_Percentage": 0.0}, {"Month": "2015-01", "Graph_Category": "Education", "Installs": 100000, "Month_str": "2015-01", "Prev_Installs": 10000.0, "Growth_Percentage": 900.0}, {"Month": "2015-06", "Graph_Category": "Education", "Installs": 1000000, "Month_str": "2015-06", "Prev_Installs": 100000.0, "Growth_Percentage": 900.0}, {"Month": "2015-08", "Graph_Category": "Education", "Installs": 1000000, "Month_str": "2015-08", "Prev_Installs": 1000000.0, "Growth_Percentage": 0.0}, {"Month": "2016-09", "Graph_Category": "Education", "Installs": 1000000, "Month_str": "2016-09", "Prev_Installs": 1000000.0, "Growth_Percentage": 0.0}, {"Month": "2016-12", "Graph_Category": "Education", "Installs": 100000, "Month_str": "2016-12", "Prev_Installs": 1000000.0, "Growth_Percentage": -90.0}, {"Month": "2017-08", "Graph_Category": "Education", "Installs": 1000000, "Month_str": "2017-08", "Prev_Installs": 100000.0, "Growth_Percentage": 900.0}, {"Month": "2017-10", "Graph_Category": "Education", "Installs": 1000000, "Month_str": "2017-10", "Prev_Installs": 1000000.0, "Growth_Percentage": 0.0}, {"Month": "2017-12", "Graph_Category": "Education", "Installs": 3000000, "Month_str": "2017-12", "Prev_Installs": 1000000.0, "Growth_Percentage": 200.0}, {"Month": "2018-05", "Graph_Category": "Education", "Installs": 2100000, "Month_str": "2018-05", "Prev_Installs": 3000000.0, "Growth_Percentage": -30.0}, {"Month": "2018-07", "Graph_Category": "Education", "Installs": 29600000, "Month_str": "2018-07", "Prev_Installs": 2100000.0, "Growth_Percentage": 1309.5238095238094}, {"Month": "2018-08", "Graph_Category": "Education", "Installs": 2000000, "Month_str": "2018-08", "Prev_Installs": 29600000.0, "Growth_Percentage": -93.24324324324324}, {"Month": "2015-09", "Graph_Category": "Entertainment", "Installs": 1000000, "Month_str": "2015-09", "Prev_Installs": 0.0, "Growth_Percentage": 0.0}, {"Month": "2016-04", "Graph_Category": "Entertainment", "Installs": 10000000, "Month_str": "2016-04", "Prev_Installs": 1000000.0, "Growth_Percentage": 900.0}, {"Month": "2016-09", "Graph_Category": "Entertainment", "Installs": 10000000, "Month_str": "2016-09", "Prev_Installs": 10000000.0, "Growth_Percentage": 0.0}, {"Month": "2018-01", "Graph_Category": "Entertainment", "Installs": 20000000, "Month_str": "2018-01", "Prev_Installs": 10000000.0, "Growth_Percentage": 100.0}, {"Month": "2018-03", "Graph_Category": "Entertainment", "Installs": 10000000, "Month_str": "2018-03", "Prev_Installs": 20000000.0, "Growth_Percentage": -50.0}, {"Month": "2018-05", "Graph_Category": "Entertainment", "Installs": 6000000, "Month_str": "2018-05", "Prev_Installs": 10000000.0, "Growth_Percentage": -40.0}, {"Month": "2018-06", "Graph_Category": "Entertainment", "Installs": 21100000, "Month_str": "2018-06", "Prev_Installs": 6000000.0, "Growth_Percentage": 251.66666666666666}, {"Month": "2018-07", "Graph_Category": "Entertainment", "Installs": 380800000, "Month_str": "2018-07", "Prev_Installs": 21100000.0, "Growth_Percentage": 1704.7393364928912}, {"Month": "2018-08", "Graph_Category": "Entertainment", "Installs": 67200000, "Month_str": "2018-08", "Prev_Installs": 380800000.0, "Growth_Percentage": -82.35294117647058}, {"Month": "2018-05", "Graph_Category": "Events", "Installs": 10000, "Month_str": "2018-05", "Prev_Installs": 0.0, "Growth_Percentage": 0.0}, {"Month": "2018-06", "Graph_Category": "Events", "Installs": 500000, "Month_str": "2018-06", "Prev_Installs": 10000.0, "Growth_Percentage": 4900.0}, {"Month": "2018-07", "Graph_Category": "Events", "Installs": 1100000, "Month_str": "2018-07", "Prev_Installs": 500000.0, "Growth_Percentage": 120.0}, {"Month": "2018-03", "Graph_Category": "सौंदर्य (Beauty)", "Installs": 5000, "Month_str": "2018-03", "Prev_Installs": 0.0, "Growth_Percentage": 0.0}, {"Month": "2018-06", "Graph_Category": "सौंदर्य (Beauty)", "Installs": 1000000, "Month_str": "2018-06", "Prev_Installs": 5000.0, "Growth_Percentage": 19900.0}, {"Month": "2018-07", "Graph_Category": "सौंदर्य (Beauty)", "Installs": 1000000, "Month_str": "2018-07", "Prev_Installs": 1000000.0, "Growth_Percentage": 0.0}, {"Month": "2018-08", "Graph_Category": "सौंदर्य (Beauty)", "Installs": 100000, "Month_str": "2018-08", "Prev_Installs": 1000000.0, "Growth_Percentage": -90.0}, {"Month": "2014-05", "Graph_Category": "வணிகம் (Business)", "Installs": 100000, "Month_str": "2014-05", "Prev_Installs": 0.0, "Growth_Percentage": 0.0}, {"Month": "2015-09", "Graph_Category": "வணிகம் (Business)", "Installs": 100000, "Month_str": "2015-09", "Prev_Installs": 100000.0, "Growth_Percentage": 0.0}, {"Month": "2016-02", "Graph_Category": "வணிகம் (Business)", "Installs": 10000, "Month_str": "2016-02", "Prev_Installs": 100000.0, "Growth_Percentage": -90.0}, {"Month": "2016-03", "Graph_Category": "வணிகம் (Business)", "Installs": 1000000, "Month_str": "2016-03", "Prev_Installs": 10000.0, "Growth_Percentage": 9900.0}, {"Month": "2017-09", "Graph_Category": "வணிகம் (Business)", "Installs": 1000000, "Month_str": "2017-09", "Prev_Installs": 1000000.0, "Growth_Percentage": 0.0}, {"Month": "2017-11", "Graph_Category": "வணிகம் (Business)", "Installs": 500000, "Month_str": "2017-11", "Prev_Installs": 1000000.0, "Growth_Percentage": -50.0}, {"Month": "2017-12", "Graph_Category": "வணிகம் (Business)", "Installs": 1001000, "Month_str": "2017-12", "Prev_Installs": 500000.0, "Growth_Percentage": 100.2}, {"Month": "2018-02", "Graph_Category": "வணிகம் (Business)", "Installs": 1000000, "Month_str": "2018-02", "Prev_Installs": 1001000.0, "Growth_Percentage": -0.0999000999000999}, {"Month": "2018-05", "Graph_Category": "வணிகம் (Business)", "Installs": 100000, "Month_str": "2018-05", "Prev_Installs": 1000000.0, "Growth_Percentage": -90.0}, {"Month": "2018-06", "Graph_Category": "வணிகம் (Business)", "Installs": 15200000, "Month_str": "2018-06", "Prev_Installs": 100000.0, "Growth_Percentage": 15100.0}, {"Month": "2018-07", "Graph_Category": "வணிகம் (Business)", "Installs": 11600000, "Month_str": "2018-07", "Prev_Installs": 15200000.0, "Growth_Percentage": -23.684210526315788}, {"Month": "2018-08", "Graph_Category": "வணிகம் (Business)", "Installs": 115100000, "Month_str": "2018-08", "Prev_Installs": 11600000.0, "Growth_Percentage": 892.2413793103449}];
+        const task5Data = {"months": ["2012-09", "2012-11", "2013-07", "2013-08", "2013-09", "2014-01", "2014-02", "2014-03", "2014-04", "2014-05", "2014-06", "2014-08", "2014-09", "2014-10", "2014-11", "2015-02", "2015-03", "2015-05", "2015-06", "2015-07", "2015-08", "2015-09", "2015-10", "2015-11", "2015-12", "2016-01", "2016-02", "2016-03", "2016-04", "2016-05", "2016-06", "2016-07", "2016-08", "2016-09", "2016-10", "2016-11", "2016-12", "2017-01", "2017-02", "2017-03", "2017-04", "2017-05", "2017-06", "2017-07", "2017-08", "2017-09", "2017-10", "2017-11", "2017-12", "2018-01", "2018-02", "2018-03", "2018-04", "2018-05", "2018-06", "2018-07", "2018-08"], "categories": {"Productividad (Productivity)": [100000.0, 100000.0, 100000.0, 105005.0, 1206005.0, 1707005.0, 1707105.0, 1707105.0, 1707105.0, 1757255.0, 1757265.0, 1757765.0, 1807765.0, 1807765.0, 2858265.0, 2858265.0, 2859265.0, 3016765.0, 3117765.0, 3122765.0, 3122765.0, 3122865.0, 3232865.0, 3737865.0, 5738965.0, 15788965.0, 16788965.0, 16793965.0, 22799965.0, 22799965.0, 22810065.0, 22861165.0, 72961265.0, 73066365.0, 90666465.0, 91667965.0, 103867985.0, 104927985.0, 104940985.0, 105452085.0, 115453095.0, 116464195.0, 117465195.0, 117466795.0, 128568395.0, 138569445.0, 149830955.0, 160983566.0, 182989646.0, 287159661.0, 293519711.0, 329825211.0, 505985311.0, 1091096691.0, 1301950486.0, 2710377309.0, 5793091369.0], "Voyages et local (Travel)": [0.0, 0.0, 1000.0, 1000.0, 1000.0, 1000.0, 11000.0, 11000.0, 11000.0, 11000.0, 11000.0, 11000.0, 11000.0, 21000.0, 21000.0, 21000.0, 21000.0, 21000.0, 21000.0, 1021100.0, 1022100.0, 1022100.0, 1022700.0, 1022700.0, 1022800.0, 1132800.0, 1132800.0, 1242800.0, 1242800.0, 1248800.0, 1248800.0, 6349000.0, 7351100.0, 7351100.0, 7381100.0, 7381200.0, 17381200.0, 17383200.0, 17389200.0, 17399210.0, 17419210.0, 17420210.0, 17430310.0, 17430310.0, 17531910.0, 17532060.0, 17692560.0, 22704665.0, 22705165.0, 84265265.0, 84275265.0, 90446765.0, 105670870.0, 110316980.0, 232489095.0, 1525327145.0, 2894887146.0], "写真 (Photography)": [0.0, 500000.0, 500000.0, 500000.0, 500000.0, 500000.0, 500010.0, 600010.0, 610010.0, 610010.0, 610010.0, 610010.0, 610010.0, 610010.0, 1710010.0, 3710010.0, 3710010.0, 3710010.0, 14210010.0, 24210110.0, 29320110.0, 30425110.0, 40425110.0, 40425110.0, 40425110.0, 90435110.0, 90435110.0, 100535110.0, 101545110.0, 101546110.0, 111546110.0, 126546610.0, 126656710.0, 127657710.0, 133658760.0, 133678760.0, 133679760.0, 134681860.0, 136191980.0, 199201980.0, 214201980.0, 214311980.0, 239362080.0, 255512130.0, 256167130.0, 273277930.0, 288334140.0, 318585140.0, 529085140.0, 541087340.0, 777100340.0, 905200340.0, 982810350.0, 1101921450.0, 1377674950.0, 2553531655.0, 4649147655.0]}};
+        const task6Data = [];
+        const task7Data = [];
+
+        // Dark Plotly Layout Template
+        const darkTemplate = {
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { color: '#94a3b8', family: 'Plus Jakarta Sans, sans-serif' },
+            margin: { l: 60, r: 40, t: 60, b: 60 },
+            xaxis: { gridcolor: '#1e293b', zerolinecolor: '#334155' },
+            yaxis: { gridcolor: '#1e293b', zerolinecolor: '#334155' }
+        };
+
+        // Render Task 2: Bubble Chart
+        (function() {
+            const categories = [...new Set(task2Data.map(d => d.Graph_Category))];
+            const traces = categories.map(cat => {
+                const subset = task2Data.filter(d => d.Graph_Category === cat);
+                return {
+                    x: subset.map(d => d.Size_MB),
+                    y: subset.map(d => d.Rating),
+                    text: subset.map(d => `<b>${d.App}</b><br>Category: ${d.Graph_Category}<br>Rating: ${d.Rating}<br>Installs: ${d.Installs.toLocaleString()}<br>Subjectivity: ${d.Sentiment_Subjectivity}`),
+                    mode: 'markers',
+                    name: cat,
+                    marker: {
+                        size: subset.map(d => Math.max(12, Math.sqrt(d.Installs) / 100)),
+                        sizemode: 'diameter',
+                        color: cat.toLowerCase().includes('game') ? '#ec4899' : undefined,
+                        opacity: 0.8,
+                        line: { color: '#fff', width: 1 }
+                    },
+                    hoverinfo: 'text'
+                };
+            });
+            Plotly.newPlot('chart-task2', traces, {
+                ...darkTemplate,
+                title: '<b>Task 2: App Size (MB) vs Rating • Bubble Size = Installs</b>',
+                xaxis: { ...darkTemplate.xaxis, title: 'App Size (MB)' },
+                yaxis: { ...darkTemplate.yaxis, title: 'Average Rating (3.5 - 5.0)', range: [3.5, 5.05] },
+                legend: { title: { text: 'Category' } }
+            }, { responsive: true });
+        })();
+
+        // Render Task 3: Top 5 Categories Bar Chart
+        (function() {
+            const trace = {
+                x: task3Data.map(d => d.Category),
+                y: task3Data.map(d => d.Installs),
+                type: 'bar',
+                marker: {
+                    color: task3Data.map(d => d.Highlight === 'Above 1 Million' ? '#3b82f6' : '#94a3b8')
+                },
+                text: task3Data.map(d => `${(d.Installs / 1e9).toFixed(2)}B`),
+                textposition: 'outside'
+            };
+            Plotly.newPlot('chart-task3', [trace], {
+                ...darkTemplate,
+                title: '<b>Task 3: Top 5 App Categories by Total Installs (Excluding A, C, G, S)</b>',
+                xaxis: { ...darkTemplate.xaxis, title: 'Category' },
+                yaxis: { ...darkTemplate.yaxis, title: 'Total Installs' }
+            }, { responsive: true });
+        })();
+
+        // Render Task 4: Line Chart (Growth Analysis)
+        (function() {
+            const categories = [...new Set(task4Data.map(d => d.Graph_Category))];
+            const traces = categories.map(cat => {
+                const subset = task4Data.filter(d => d.Graph_Category === cat);
+                return {
+                    x: subset.map(d => d.Month),
+                    y: subset.map(d => d.Installs),
+                    mode: 'lines+markers',
+                    name: cat,
+                    line: { width: 2.5 }
+                };
+            });
+            Plotly.newPlot('chart-task4', traces, {
+                ...darkTemplate,
+                title: '<b>Task 4: Monthly Trend of Total Installs (Shaded where MoM Growth > 20%)</b>',
+                xaxis: { ...darkTemplate.xaxis, title: 'Month' },
+                yaxis: { ...darkTemplate.yaxis, title: 'Total Installs' }
+            }, { responsive: true });
+        })();
+
+        // Render Task 5: Stacked Area Chart
+        (function() {
+            const traces = Object.keys(task5Data.categories).map((cat, idx) => {
+                const colors = ['#8b5cf6', '#06b6d4', '#ec4899'];
+                return {
+                    x: task5Data.months,
+                    y: task5Data.categories[cat],
+                    name: cat,
+                    stackgroup: 'one',
+                    mode: 'lines',
+                    line: { color: colors[idx % colors.length] },
+                    fillcolor: colors[idx % colors.length] + '88'
+                };
+            });
+            Plotly.newPlot('chart-task5', traces, {
+                ...darkTemplate,
+                title: '<b>Task 5: Cumulative Installs Over Time by Localized Category</b>',
+                xaxis: { ...darkTemplate.xaxis, title: 'Month' },
+                yaxis: { ...darkTemplate.yaxis, title: 'Cumulative Installs' }
+            }, { responsive: true });
+        })();
+
+        // Render Task 6: Dual-Metric Bar Chart
+        (function() {
+            const traceRating = {
+                x: task6Data.map(d => d.Category),
+                y: task6Data.map(d => d.Avg_Rating),
+                name: 'Average Rating (Stars)',
+                type: 'bar',
+                marker: { color: '#3b82f6' },
+                offsetgroup: 1
+            };
+            const traceReviews = {
+                x: task6Data.map(d => d.Category),
+                y: task6Data.map(d => d.Total_Reviews_M),
+                name: 'Total Reviews (Millions)',
+                type: 'bar',
+                marker: { color: '#f59e0b' },
+                offsetgroup: 2
+            };
+            Plotly.newPlot('chart-task6', [traceRating, traceReviews], {
+                ...darkTemplate,
+                title: '<b>Task 6: Average Rating & Total Reviews for Top 10 Categories by Installs</b>',
+                barmode: 'group',
+                xaxis: { ...darkTemplate.xaxis, title: 'Category' },
+                yaxis: { ...darkTemplate.yaxis, title: 'Metric Value' }
+            }, { responsive: true });
+        })();
+
+        // Render Task 7: Free vs Paid Segmented Matrix
+        (function() {
+            const traceInstalls = {
+                x: task7Data.map(d => `${d.Category} (${d.Type})`),
+                y: task7Data.map(d => d.Avg_Installs),
+                name: 'Average Installs',
+                type: 'bar',
+                marker: { color: '#10b981' }
+            };
+            Plotly.newPlot('chart-task7', [traceInstalls], {
+                ...darkTemplate,
+                title: '<b>Task 7: Average Installs for Top 3 Filtered Categories by Pricing Type</b>',
+                xaxis: { ...darkTemplate.xaxis, title: 'Category & Pricing Model' },
+                yaxis: { ...darkTemplate.yaxis, title: 'Average Installs' }
+            }, { responsive: true });
+        })();
+    </script>
+</body>
+</html>
