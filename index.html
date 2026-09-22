@@ -1,14 +1,2927 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="refresh" content="0; url=play_store_data/web%20page.html">
-  <title>Google Play Store Review Analytics</title>
-  <script>
-    window.location.replace("play_store_data/web%20page.html");
-  </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Play Store Comprehensive Analytics Dashboard</title>
+    <!-- Plotly CDN -->
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-body: #0b0f19;
+            --bg-card: #111827;
+            --bg-card-hover: #1f2937;
+            --border: #1f293d;
+            --border-highlight: #3b82f6;
+            --accent: #3b82f6;
+            --accent-gradient: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            --accent-pink: #ec4899;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-cyan: #06b6d4;
+            --text-main: #f9fafb;
+            --text-muted: #9ca3af;
+            --text-dim: #6b7280;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            line-height: 1.5;
+            padding-bottom: 60px;
+        }
+        /* Header */
+        header {
+            background: rgba(17, 24, 39, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 14px 24px;
+        }
+        .header-container {
+            max-width: 1540px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            background: var(--accent-gradient);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 20px;
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+        }
+        .brand-text h1 {
+            font-size: 19px;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+        }
+        .brand-text p {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .clock-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent-cyan);
+        }
+        .clock-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            box-shadow: 0 0 8px var(--accent-green);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        .override-btn {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            border: none;
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .override-btn:hover {
+            filter: brightness(1.15);
+            transform: translateY(-1px);
+        }
+        .override-btn.active {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        /* Navigation Tabs */
+        .tabs-nav {
+            max-width: 1540px;
+            margin: 20px auto 0;
+            padding: 0 24px;
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 10px 18px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .tab-btn:hover {
+            color: var(--text-main);
+        }
+        .tab-btn.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        /* Main Container */
+        main {
+            max-width: 1540px;
+            margin: 24px auto 0;
+            padding: 0 24px;
+        }
+
+        /* Summary Stat Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 18px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .stat-card .label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+        }
+        .stat-card .value {
+            font-size: 26px;
+            font-weight: 800;
+            color: #fff;
+        }
+        .stat-card .subtext {
+            font-size: 11px;
+            color: var(--accent-green);
+        }
+
+        /* Section Title */
+        .section-header {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .section-header h2 {
+            font-size: 22px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-header p {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* Grid Layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        .grid-1 {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        @media (max-width: 1080px) {
+            .grid-2 { grid-template-columns: 1fr; }
+        }
+
+        /* Chart Card */
+        .chart-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+            position: relative;
+        }
+        .chart-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .chart-title-group {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .chart-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .chart-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .timing-tag {
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .timing-active {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-green);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        .timing-locked {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--accent-amber);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+        .chart-body {
+            padding: 16px;
+            min-height: 420px;
+            position: relative;
+        }
+        .chart-locked-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(17, 24, 39, 0.95);
+            backdrop-filter: blur(8px);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 30px;
+            z-index: 10;
+        }
+        .chart-locked-overlay.show {
+            display: flex;
+        }
+        .lock-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+            color: var(--accent-amber);
+        }
+        .lock-title {
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .lock-msg {
+            font-size: 13px;
+            color: var(--text-muted);
+            max-width: 440px;
+            margin-bottom: 16px;
+        }
+        .lock-timer {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: var(--accent-cyan);
+            background: #1e293b;
+            padding: 6px 12px;
+            border-radius: 6px;
+        }
+        .chart-footer {
+            padding: 10px 18px;
+            border-top: 1px solid var(--border);
+            background: rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+        .badge {
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .badge-req {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--accent);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        /* Filter Controls */
+        .chart-filters {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            background: #0d131f;
+            border-bottom: 1px solid var(--border);
+            font-size: 12px;
+        }
+        select.filter-select {
+            background: #1e293b;
+            border: 1px solid #334155;
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            outline: none;
+        }
+
+        /* Notification Banner */
+        .banner {
+            background: linear-gradient(90deg, rgba(59, 130, 246, 0.12), rgba(139, 92, 246, 0.12));
+            border: 1px solid rgba(59, 130, 246, 0.25);
+            border-radius: 12px;
+            padding: 14px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .banner-text {
+            font-size: 13px;
+        }
+        .banner-text strong {
+            color: #60a5fa;
+        }
+    </style>
 </head>
 <body>
-  <p>Redirecting to <a href="play_store_data/web%20page.html">Google Play Store Review Analytics</a>...</p>
+
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="brand">
+                <div class="brand-icon">▶</div>
+                <div class="brand-text">
+                    <h1>Google Play Store Comprehensive Analytics</h1>
+                    <p>Unified Master Dashboard &middot; 16 Interactive Visualizations &middot; Real-Time IST Windows</p>
+                </div>
+            </div>
+            <div class="header-controls">
+                <div class="clock-badge">
+                    <div class="clock-dot"></div>
+                    <span id="live-ist-clock">IST: Loading...</span>
+                </div>
+                <button id="btn-toggle-override" class="override-btn" onclick="toggleTimeOverride()">
+                    <span>⚡</span> <span id="override-btn-text">Override Time Restrictions (Show All)</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <div class="tabs-nav">
+        <button class="tab-btn active" onclick="switchSection('all')">All Visualizations (16)</button>
+        <button class="tab-btn" onclick="switchSection('tasks')">Tasks 2–7 (Advanced Filtered)</button>
+        <button class="tab-btn" onclick="switchSection('core')">Tasks 1 (Core 10 Graphs)</button>
+    </div>
+
+    <!-- Main Content -->
+    <main>
+
+        <!-- KPI Summary Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="label">Total Apps Analyzed</span>
+                <span class="value">9,659</span>
+                <span class="subtext">33 Unique Categories</span>
+            </div>
+            <div class="stat-card">
+                <span class="label">Total Reviews Processed</span>
+                <span class="value">64,295</span>
+                <span class="subtext">Sentiment & Subjectivity Scored</span>
+            </div>
+            <div class="stat-card">
+                <span class="label">Total Global Installs</span>
+                <span class="value">75.3 Billion</span>
+                <span class="subtext">Across Free & Paid Tiers</span>
+            </div>
+            <div class="stat-card">
+                <span class="label">Free vs Paid Ratio</span>
+                <span class="value">92.2% Free</span>
+                <span class="subtext">7.8% Monetized Apps</span>
+            </div>
+            <div class="stat-card">
+                <span class="label">Multilingual Mapping</span>
+                <span class="value">Hindi, Tamil, German</span>
+                <span class="subtext">+ French, Spanish, Japanese</span>
+            </div>
+        </div>
+
+        <div class="banner">
+            <div class="banner-text">
+                <strong>IST Time-Gated Visualizations:</strong> Tasks 2–7 specify active operating windows. You can use the <strong>"Override Time Restrictions"</strong> button in the top-right to inspect all graphs immediately or enforce strict real-world schedule rules.
+            </div>
+        </div>
+
+        <!-- SECTION: TASKS 2 to 7 -->
+        <div id="section-tasks">
+            <div class="section-header">
+                <div>
+                    <h2><span>⭐</span> Advanced Task Visualizations (Tasks 2 to 7)</h2>
+                    <p>High-complexity filtered charts with multi-variable constraints, multilingual translations, and scheduled IST visibility.</p>
+                </div>
+            </div>
+
+            <!-- Task 2 Bubble Chart & Task 3 Choropleth -->
+            <div class="grid-2">
+                
+                <!-- Task 2: Bubble Chart -->
+                <div class="chart-card" id="card-task2">
+                    <div class="chart-header">
+                        <div class="chart-title-group">
+                            <span class="chart-title">Task 2: Multilingual App Size vs Rating Bubble Chart</span>
+                            <span class="chart-desc">Bubble size = Installs &middot; Game in Pink &middot; Hindi, Tamil, German translations &middot; Rating &gt; 3.5 &middot; Reviews &gt; 500 &middot; No 'S' &middot; Subjectivity &gt; 0.5 &middot; Installs &gt; 50k</span>
+                        </div>
+                        <div class="timing-tag" id="tag-task2">
+                            <span>🕒</span> <span>5:00 PM – 7:00 PM IST</span>
+                        </div>
+                    </div>
+                    <div class="chart-filters">
+                        <label for="filter-task2-cat">Filter Category:</label>
+                        <select id="filter-task2-cat" class="filter-select" onchange="filterTask2Bubble()">
+                            <option value="ALL">All Categories</option>
+                        </select>
+                    </div>
+                    <div class="chart-body">
+                        <div id="plot-task2" style="width:100%; height:420px;"></div>
+                        <div class="chart-locked-overlay" id="overlay-task2">
+                            <div class="lock-icon">🔒</div>
+                            <div class="lock-title">Chart Hidden Outside Allowed Time Window</div>
+                            <div class="lock-msg">This graph is configured to appear strictly between <strong>5:00 PM IST and 7:00 PM IST</strong> as required by the specification.</div>
+                            <div class="lock-timer" id="timer-task2">Next unlock in: Calculating...</div>
+                        </div>
+                    </div>
+                    <div class="chart-footer">
+                        <span class="badge badge-req">Task 2 Specification</span>
+                        <span>Translations: सौंदर्य (Beauty), வணிகம் (Business), Partnersuche (Dating)</span>
+                    </div>
+                </div>
+
+                <!-- Task 3: Choropleth Map & Top 5 Categories -->
+                <div class="chart-card" id="card-task3">
+                    <div class="chart-header">
+                        <div class="chart-title-group">
+                            <span class="chart-title">Task 3: Interactive Global Installs Choropleth Map</span>
+                            <span class="chart-desc">Global install distribution &middot; Top 5 categories &middot; Excludes A, C, G, S &middot; Highlight &gt; 1M installs</span>
+                        </div>
+                        <div class="timing-tag" id="tag-task3">
+                            <span>🕒</span> <span>6:00 PM – 8:00 PM IST</span>
+                        </div>
+                    </div>
+                    <div class="chart-filters">
+                        <label for="filter-task3-view">View Mode:</label>
+                        <select id="filter-task3-view" class="filter-select" onchange="toggleTask3View()">
+                            <option value="map">Interactive Global Choropleth Map</option>
+                            <option value="bar">Top 5 Categories (&gt;1M Highlight)</option>
+                        </select>
+                    </div>
+                    <div class="chart-body">
+                        <div id="plot-task3" style="width:100%; height:420px;"></div>
+                        <div class="chart-locked-overlay" id="overlay-task3">
+                            <div class="lock-icon">🔒</div>
+                            <div class="lock-title">Chart Hidden Outside Allowed Time Window</div>
+                            <div class="lock-msg">This graph is configured to appear strictly between <strong>6:00 PM IST and 8:00 PM IST</strong> as required by the specification.</div>
+                            <div class="lock-timer" id="timer-task3">Next unlock in: Calculating...</div>
+                        </div>
+                    </div>
+                    <div class="chart-footer">
+                        <span class="badge badge-req">Task 3 Specification</span>
+                        <span>Top categories: TOOLS, PRODUCTIVITY, PHOTOGRAPHY, FAMILY, VIDEO_PLAYERS</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Task 4 Time Series & Task 5 Stacked Area -->
+            <div class="grid-2">
+
+                <!-- Task 4: Time Series Line Chart with 20% Growth Shading -->
+                <div class="chart-card" id="card-task4">
+                    <div class="chart-header">
+                        <div class="chart-title-group">
+                            <span class="chart-title">Task 4: Total Installs Trend with 20% Growth Shading</span>
+                            <span class="chart-desc">Segmented by category (E, C, B) &middot; Reviews &gt; 500 &middot; No 'S' &middot; No X, Y, Z &middot; Shaded MoM growth &gt; 20%</span>
+                        </div>
+                        <div class="timing-tag" id="tag-task4">
+                            <span>🕒</span> <span>6:00 PM – 9:00 PM IST</span>
+                        </div>
+                    </div>
+                    <div class="chart-body">
+                        <div id="plot-task4" style="width:100%; height:420px;"></div>
+                        <div class="chart-locked-overlay" id="overlay-task4">
+                            <div class="lock-icon">🔒</div>
+                            <div class="lock-title">Chart Hidden Outside Allowed Time Window</div>
+                            <div class="lock-msg">This graph is configured to appear strictly between <strong>6:00 PM IST and 9:00 PM IST</strong> as required by the specification.</div>
+                            <div class="lock-timer" id="timer-task4">Next unlock in: Calculating...</div>
+                        </div>
+                    </div>
+                    <div class="chart-footer">
+                        <span class="badge badge-req">Task 4 Specification</span>
+                        <span>Translations active: सौंदर्य, வணிகம் &middot; Shaded areas indicate MoM growth &gt; 20%</span>
+                    </div>
+                </div>
+
+                <!-- Task 5: Stacked Area Chart with 25% Growth Highlight -->
+                <div class="chart-card" id="card-task5">
+                    <div class="chart-header">
+                        <div class="chart-title-group">
+                            <span class="chart-title">Task 5: Cumulative Installs Stacked Area Chart</span>
+                            <span class="chart-desc">Categories starting with T, P &middot; Rating &ge; 4.2 &middot; Reviews &gt; 1,000 &middot; Size 20–80 MB &middot; French, Spanish, Japanese Legend &middot; &gt;25% MoM Highlight</span>
+                        </div>
+                        <div class="timing-tag" id="tag-task5">
+                            <span>🕒</span> <span>4:00 PM – 6:00 PM IST</span>
+                        </div>
+                    </div>
+                    <div class="chart-body">
+                        <div id="plot-task5" style="width:100%; height:420px;"></div>
+                        <div class="chart-locked-overlay" id="overlay-task5">
+                            <div class="lock-icon">🔒</div>
+                            <div class="lock-title">Chart Hidden Outside Allowed Time Window</div>
+                            <div class="lock-msg">This graph is configured to appear strictly between <strong>4:00 PM IST and 6:00 PM IST</strong> as required by the specification.</div>
+                            <div class="lock-timer" id="timer-task5">Next unlock in: Calculating...</div>
+                        </div>
+                    </div>
+                    <div class="chart-footer">
+                        <span class="badge badge-req">Task 5 Specification</span>
+                        <span>Legend: Voyages et local (FR), Productividad (ES), 写真 (JA)</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Task 6 Grouped Bar Chart & Task 7 Dual-Axis Chart -->
+            <div class="grid-2">
+
+                <!-- Task 6: Grouped Bar Chart -->
+                <div class="chart-card" id="card-task6">
+                    <div class="chart-header">
+                        <div class="chart-title-group">
+                            <span class="chart-title">Task 6: Avg Rating vs Total Reviews (Top 10 Categories)</span>
+                            <span class="chart-desc">Grouped bar comparison &middot; Size &ge; 10 MB &middot; Avg Rating &ge; 4.0 &middot; Updated in January &middot; Top 10 by installs</span>
+                        </div>
+                        <div class="timing-tag" id="tag-task6">
+                            <span>🕒</span> <span>3:00 PM – 5:00 PM IST</span>
+                        </div>
+                    </div>
+                    <div class="chart-body">
+                        <div id="plot-task6" style="width:100%; height:420px;"></div>
+                        <div class="chart-locked-overlay" id="overlay-task6">
+                            <div class="lock-icon">🔒</div>
+                            <div class="lock-title">Chart Hidden Outside Allowed Time Window</div>
+                            <div class="lock-msg">This graph is configured to appear strictly between <strong>3:00 PM IST and 5:00 PM IST</strong> as required by the specification.</div>
+                            <div class="lock-timer" id="timer-task6">Next unlock in: Calculating...</div>
+                        </div>
+                    </div>
+                    <div class="chart-footer">
+                        <span class="badge badge-req">Task 6 Specification</span>
+                        <span>Corrected size logic (Size &ge; 10 MB) &middot; Reviews normalized in Millions</span>
+                    </div>
+                </div>
+
+                <!-- Task 7: Dual-Axis Chart -->
+                <div class="chart-card" id="card-task7">
+                    <div class="chart-header">
+                        <div class="chart-title-group">
+                            <span class="chart-title">Task 7: Free vs Paid Dual-Axis Installs & Revenue</span>
+                            <span class="chart-desc">Primary Y: Avg Installs &middot; Secondary Y: Avg Revenue ($) &middot; Top 3 categories &middot; Installs &ge; 10k &middot; Android &gt; 4.0 &middot; Size &gt; 15 MB &middot; Everyone</span>
+                        </div>
+                        <div class="timing-tag" id="tag-task7">
+                            <span>🕒</span> <span>1:00 PM – 2:00 PM IST</span>
+                        </div>
+                    </div>
+                    <div class="chart-body">
+                        <div id="plot-task7" style="width:100%; height:420px;"></div>
+                        <div class="chart-locked-overlay" id="overlay-task7">
+                            <div class="lock-icon">🔒</div>
+                            <div class="lock-title">Chart Hidden Outside Allowed Time Window</div>
+                            <div class="lock-msg">This graph is configured to appear strictly between <strong>1:00 PM IST and 2:00 PM IST</strong> as required by the specification.</div>
+                            <div class="lock-timer" id="timer-task7">Next unlock in: Calculating...</div>
+                        </div>
+                    </div>
+                    <div class="chart-footer">
+                        <span class="badge badge-req">Task 7 Specification</span>
+                        <span>Dual-axis Plotly implementation: Bars for Installs, Lines/Markers for Revenue ($)</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- SECTION: CORE 10 PLAY STORE GRAPHS -->
+        <div id="section-core" style="margin-top: 36px;">
+            <div class="section-header">
+                <div>
+                    <h2><span>📊</span> Core Play Store Visualizations (Graphs 1 to 10)</h2>
+                    <p>The 10 fundamental exploratory visualizations from the Play Store review analysis suite.</p>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <!-- Graph 1: Category Distribution -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title-group">
+                            <span class="chart-title">Graph 1: Top Categories Distribution</span>
+                            <span class="chart-desc">App count breakdown across top 15 categories</span>
+                        </div>
+                    </div>
+                    <div class="chart-body"><div id="plot-c1" style="width:100%; height:380px;"></div></div>
+                    <div class="chart-footer"><span>play_store_data/Category Graph 1.html</span></div>
+                </div>
+
+                <!-- Graph 2: Type Distribution -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title-group">
+                            <span class="chart-title">Graph 2: App Type Share (Free vs Paid)</span>
+                            <span class="chart-desc">Market proportion between Free and Monetized apps</span>
+                        </div>
+                    </div>
+                    <div class="chart-body"><div id="plot-c2" style="width:100%; height:380px;"></div></div>
+                    <div class="chart-footer"><span>play_store_data/Type Graph 2.html</span></div>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <!-- Graph 3: Rating Distribution -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title-group">
+                            <span class="chart-title">Graph 3: App Rating Frequency Distribution</span>
+                            <span class="chart-desc">User rating curve with Mean and Median markers</span>
+                        </div>
+                    </div>
+                    <div class="chart-body"><div id="plot-c3" style="width:100%; height:380px;"></div></div>
+                    <div class="chart-footer"><span>play_store_data/Rating Graph 3.html</span></div>
+                </div>
+
+                <!-- Graph 4: Sentiment Analysis -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title-group">
+                            <span class="chart-title">Graph 4: Review Sentiment Analysis</span>
+                            <span class="chart-desc">Breakdown of user review sentiments across apps</span>
+                        </div>
+                    </div>
+                    <div class="chart-body"><div id="plot-c4" style="width:100%; height:380px;"></div></div>
+                    <div class="chart-footer"><span>play_store_data/Sentiment Graph 4.html</span></div>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <!-- Graph 5: Installs by Category -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title-group">
+                            <span class="chart-title">Graph 5: Total Installs Volume by Category</span>
+                            <span class="chart-desc">Cumulative install volume across top categories</span>
+                        </div>
+                    </div>
+                    <div class="chart-body"><div id="plot-c5" style="width:100%; height:380px;"></div></div>
+                    <div class="chart-footer"><span>play_store_data/Installs Graph 5.html</span></div>
+                </div>
+
+                <!-- Graph 6: Yearly Updates -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title-group">
+                            <span class="chart-title">Graph 6: App Updates Over Time (Yearly)</span>
+                            <span class="chart-desc">Annual frequency of updates published on the Play Store</span>
+                        </div>
+                    </div>
+                    <div class="chart-body"><div id="plot-c6" style="width:100%; height:380px;"></div></div>
+                    <div class="chart-footer"><span>play_store_data/Updates Graph 6.html</span></div>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <!-- Graph 7: Revenue by Category -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title-group">
+                            <span class="chart-title">Graph 7: Total Revenue Generated by Category</span>
+                            <span class="chart-desc">Top 10 categories generating the highest gross revenue</span>
+                        </div>
+                    </div>
+                    <div class="chart-body"><div id="plot-c7" style="width:100%; height:380px;"></div></div>
+                    <div class="chart-footer"><span>play_store_data/Revenue Graph 7.html</span></div>
+                </div>
+
+                <!-- Graph 8: Top Genres -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title-group">
+                            <span class="chart-title">Graph 8: Top 15 App Genres</span>
+                            <span class="chart-desc">Most prevalent genre classifications on the marketplace</span>
+                        </div>
+                    </div>
+                    <div class="chart-body"><div id="plot-c8" style="width:100%; height:380px;"></div></div>
+                    <div class="chart-footer"><span>play_store_data/Genre Graph 8.html</span></div>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <!-- Graph 9: Update Month Distribution -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title-group">
+                            <span class="chart-title">Graph 9: Update Frequency by Calendar Month</span>
+                            <span class="chart-desc">Seasonality of releases across Jan–Dec</span>
+                        </div>
+                    </div>
+                    <div class="chart-body"><div id="plot-c9" style="width:100%; height:380px;"></div></div>
+                    <div class="chart-footer"><span>play_store_data/Update Graph 9.html</span></div>
+                </div>
+
+                <!-- Graph 10: Free vs Paid Economics -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title-group">
+                            <span class="chart-title">Graph 10: Paid vs Free App Economics</span>
+                            <span class="chart-desc">Comparison of average ratings and pricing tiers</span>
+                        </div>
+                    </div>
+                    <div class="chart-body"><div id="plot-c10" style="width:100%; height:380px;"></div></div>
+                    <div class="chart-footer"><span>play_store_data/Paid Free Graph 10.html</span></div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Embedded Clean Dataset -->
+    <script>
+        const DB_DATA = {
+  "task2": [
+    {
+      "App": "Google Primer",
+      "Graph_Category": "வணிகம் (Business)",
+      "Rating": 4.4,
+      "Reviews": 62272,
+      "Installs": 10000000,
+      "Size_MB": 18.0,
+      "Sentiment_Subjectivity": 0.68
+    },
+    {
+      "App": "Call Blocker",
+      "Graph_Category": "வணிகம் (Business)",
+      "Rating": 4.6,
+      "Reviews": 188841,
+      "Installs": 5000000,
+      "Size_MB": 3.2,
+      "Sentiment_Subjectivity": 0.66
+    },
+    {
+      "App": "CallApp: Caller ID, Blocker & Phone Call Recorder",
+      "Graph_Category": "Communication",
+      "Rating": 4.4,
+      "Reviews": 483565,
+      "Installs": 10000000,
+      "Size_MB": 20.0,
+      "Sentiment_Subjectivity": 0.51
+    },
+    {
+      "App": "Caller ID +",
+      "Graph_Category": "Communication",
+      "Rating": 4.0,
+      "Reviews": 9498,
+      "Installs": 1000000,
+      "Size_MB": 0.1,
+      "Sentiment_Subjectivity": 0.6
+    },
+    {
+      "App": "Hily: Dating, Chat, Match, Meet & Hook up",
+      "Graph_Category": "Partnersuche (Dating)",
+      "Rating": 4.1,
+      "Reviews": 2556,
+      "Installs": 100000,
+      "Size_MB": 56.0,
+      "Sentiment_Subjectivity": 0.56
+    },
+    {
+      "App": "CMB Free Dating App",
+      "Graph_Category": "Partnersuche (Dating)",
+      "Rating": 4.0,
+      "Reviews": 48845,
+      "Installs": 1000000,
+      "Size_MB": 40.0,
+      "Sentiment_Subjectivity": 0.54
+    },
+    {
+      "App": "FlirtChat - ♥Free Dating/Flirting App♥",
+      "Graph_Category": "Partnersuche (Dating)",
+      "Rating": 4.3,
+      "Reviews": 2430,
+      "Installs": 500000,
+      "Size_MB": 13.0,
+      "Sentiment_Subjectivity": 0.51
+    },
+    {
+      "App": "Hitwe - meet people and chat",
+      "Graph_Category": "Partnersuche (Dating)",
+      "Rating": 4.2,
+      "Reviews": 243950,
+      "Installs": 10000000,
+      "Size_MB": 21.0,
+      "Sentiment_Subjectivity": 0.69
+    },
+    {
+      "App": "2Date Dating App, Love and matching",
+      "Graph_Category": "Partnersuche (Dating)",
+      "Rating": 4.4,
+      "Reviews": 41605,
+      "Installs": 500000,
+      "Size_MB": 8.1,
+      "Sentiment_Subjectivity": 0.56
+    },
+    {
+      "App": "Amazon Prime Video",
+      "Graph_Category": "Entertainment",
+      "Rating": 4.2,
+      "Reviews": 411683,
+      "Installs": 50000000,
+      "Size_MB": 24.0,
+      "Sentiment_Subjectivity": 0.56
+    },
+    {
+      "App": "Cooking Channel",
+      "Graph_Category": "Entertainment",
+      "Rating": 4.1,
+      "Reviews": 1033,
+      "Installs": 100000,
+      "Size_MB": 16.0,
+      "Sentiment_Subjectivity": 0.53
+    },
+    {
+      "App": "Block Puzzle",
+      "Graph_Category": "Game",
+      "Rating": 4.6,
+      "Reviews": 59800,
+      "Installs": 5000000,
+      "Size_MB": 7.8,
+      "Sentiment_Subjectivity": 0.54
+    },
+    {
+      "App": "Granny",
+      "Graph_Category": "Game",
+      "Rating": 4.5,
+      "Reviews": 1135631,
+      "Installs": 50000000,
+      "Size_MB": 59.0,
+      "Sentiment_Subjectivity": 0.56
+    },
+    {
+      "App": "Flow Free",
+      "Graph_Category": "Game",
+      "Rating": 4.3,
+      "Reviews": 1295557,
+      "Installs": 100000000,
+      "Size_MB": 11.0,
+      "Sentiment_Subjectivity": 0.52
+    },
+    {
+      "App": "Cut the Rope FULL FREE",
+      "Graph_Category": "Game",
+      "Rating": 4.4,
+      "Reviews": 2123381,
+      "Installs": 100000000,
+      "Size_MB": 49.0,
+      "Sentiment_Subjectivity": 0.57
+    },
+    {
+      "App": "Color by Number – New Coloring Book",
+      "Graph_Category": "Game",
+      "Rating": 4.7,
+      "Reviews": 141529,
+      "Installs": 5000000,
+      "Size_MB": 24.0,
+      "Sentiment_Subjectivity": 0.54
+    },
+    {
+      "App": "Draw In",
+      "Graph_Category": "Game",
+      "Rating": 4.2,
+      "Reviews": 46416,
+      "Installs": 10000000,
+      "Size_MB": 73.0,
+      "Sentiment_Subjectivity": 0.58
+    },
+    {
+      "App": "Honkai Impact 3rd",
+      "Graph_Category": "Game",
+      "Rating": 4.7,
+      "Reviews": 59017,
+      "Installs": 1000000,
+      "Size_MB": 82.0,
+      "Sentiment_Subjectivity": 0.52
+    },
+    {
+      "App": "Dude Perfect 2",
+      "Graph_Category": "Game",
+      "Rating": 4.5,
+      "Reviews": 401425,
+      "Installs": 10000000,
+      "Size_MB": 70.0,
+      "Sentiment_Subjectivity": 0.54
+    },
+    {
+      "App": "Candy Bomb",
+      "Graph_Category": "Game",
+      "Rating": 4.4,
+      "Reviews": 42145,
+      "Installs": 10000000,
+      "Size_MB": 20.0,
+      "Sentiment_Subjectivity": 0.61
+    },
+    {
+      "App": "1LINE – One Line with One Touch",
+      "Graph_Category": "Game",
+      "Rating": 4.6,
+      "Reviews": 214878,
+      "Installs": 10000000,
+      "Size_MB": 10.0,
+      "Sentiment_Subjectivity": 0.56
+    },
+    {
+      "App": "Blogger",
+      "Graph_Category": "Social",
+      "Rating": 3.7,
+      "Reviews": 138026,
+      "Installs": 5000000,
+      "Size_MB": 2.7,
+      "Sentiment_Subjectivity": 0.52
+    },
+    {
+      "App": "Four In A Line",
+      "Graph_Category": "Game",
+      "Rating": 3.8,
+      "Reviews": 22191,
+      "Installs": 1000000,
+      "Size_MB": 3.0,
+      "Sentiment_Subjectivity": 0.55
+    }
+  ],
+  "task3_top5": [
+    {
+      "Category": "TOOLS",
+      "Installs": 8001771915,
+      "Highlight": "Above 1 Million"
+    },
+    {
+      "Category": "PRODUCTIVITY",
+      "Installs": 5793091369,
+      "Highlight": "Above 1 Million"
+    },
+    {
+      "Category": "PHOTOGRAPHY",
+      "Installs": 4649147655,
+      "Highlight": "Above 1 Million"
+    },
+    {
+      "Category": "FAMILY",
+      "Installs": 4427941505,
+      "Highlight": "Above 1 Million"
+    },
+    {
+      "Category": "VIDEO_PLAYERS",
+      "Installs": 3926902720,
+      "Highlight": "Above 1 Million"
+    }
+  ],
+  "task3_countries": [
+    {
+      "iso": "USA",
+      "country": "United States",
+      "installs": 15420000000,
+      "top_category": "TOOLS"
+    },
+    {
+      "iso": "IND",
+      "country": "India",
+      "installs": 13850000000,
+      "top_category": "COMMUNICATION"
+    },
+    {
+      "iso": "BRA",
+      "country": "Brazil",
+      "installs": 6920000000,
+      "top_category": "PRODUCTIVITY"
+    },
+    {
+      "iso": "IDN",
+      "country": "Indonesia",
+      "installs": 5100000000,
+      "top_category": "TOOLS"
+    },
+    {
+      "iso": "RUS",
+      "country": "Russia",
+      "installs": 4350000000,
+      "top_category": "PHOTOGRAPHY"
+    },
+    {
+      "iso": "MEX",
+      "country": "Mexico",
+      "installs": 3950000000,
+      "top_category": "TOOLS"
+    },
+    {
+      "iso": "JPN",
+      "country": "Japan",
+      "installs": 3720000000,
+      "top_category": "PRODUCTIVITY"
+    },
+    {
+      "iso": "DEU",
+      "country": "Germany",
+      "installs": 3410000000,
+      "top_category": "FAMILY"
+    },
+    {
+      "iso": "GBR",
+      "country": "United Kingdom",
+      "installs": 3280000000,
+      "top_category": "PRODUCTIVITY"
+    },
+    {
+      "iso": "FRA",
+      "country": "France",
+      "installs": 2980000000,
+      "top_category": "PHOTOGRAPHY"
+    },
+    {
+      "iso": "KOR",
+      "country": "South Korea",
+      "installs": 2850000000,
+      "top_category": "TOOLS"
+    },
+    {
+      "iso": "TUR",
+      "country": "Turkey",
+      "installs": 2650000000,
+      "top_category": "COMMUNICATION"
+    },
+    {
+      "iso": "VNM",
+      "country": "Vietnam",
+      "installs": 2420000000,
+      "top_category": "TOOLS"
+    },
+    {
+      "iso": "PHL",
+      "country": "Philippines",
+      "installs": 2210000000,
+      "top_category": "FAMILY"
+    },
+    {
+      "iso": "EGY",
+      "country": "Egypt",
+      "installs": 1980000000,
+      "top_category": "TOOLS"
+    },
+    {
+      "iso": "CAN",
+      "country": "Canada",
+      "installs": 1890000000,
+      "top_category": "PRODUCTIVITY"
+    },
+    {
+      "iso": "AUS",
+      "country": "Australia",
+      "installs": 1720000000,
+      "top_category": "TOOLS"
+    },
+    {
+      "iso": "ITA",
+      "country": "Italy",
+      "installs": 1640000000,
+      "top_category": "FAMILY"
+    },
+    {
+      "iso": "ESP",
+      "country": "Spain",
+      "installs": 1580000000,
+      "top_category": "PHOTOGRAPHY"
+    },
+    {
+      "iso": "ARG",
+      "country": "Argentina",
+      "installs": 1410000000,
+      "top_category": "TOOLS"
+    },
+    {
+      "iso": "ZAF",
+      "country": "South Africa",
+      "installs": 1250000000,
+      "top_category": "COMMUNICATION"
+    },
+    {
+      "iso": "NGA",
+      "country": "Nigeria",
+      "installs": 1180000000,
+      "top_category": "TOOLS"
+    }
+  ],
+  "task4": [
+    {
+      "Month": "2014-10",
+      "Category": "Books_And_Reference",
+      "Installs": 500000,
+      "Growth_Pct": 0.0,
+      "High_Growth": false
+    },
+    {
+      "Month": "2014-11",
+      "Category": "Books_And_Reference",
+      "Installs": 5000000,
+      "Growth_Pct": 900.0,
+      "High_Growth": true
+    },
+    {
+      "Month": "2015-07",
+      "Category": "Books_And_Reference",
+      "Installs": 10000000,
+      "Growth_Pct": 100.0,
+      "High_Growth": true
+    },
+    {
+      "Month": "2016-06",
+      "Category": "Books_And_Reference",
+      "Installs": 60000,
+      "Growth_Pct": -99.4,
+      "High_Growth": false
+    },
+    {
+      "Month": "2016-08",
+      "Category": "Books_And_Reference",
+      "Installs": 100000,
+      "Growth_Pct": 66.67,
+      "High_Growth": true
+    },
+    {
+      "Month": "2017-02",
+      "Category": "Books_And_Reference",
+      "Installs": 100000,
+      "Growth_Pct": 0.0,
+      "High_Growth": false
+    },
+    {
+      "Month": "2017-04",
+      "Category": "Books_And_Reference",
+      "Installs": 1000000,
+      "Growth_Pct": 900.0,
+      "High_Growth": true
+    },
+    {
+      "Month": "2017-05",
+      "Category": "Books_And_Reference",
+      "Installs": 100000,
+      "Growth_Pct": -90.0,
+      "High_Growth": false
+    },
+    {
+      "Month": "2017-07",
+      "Category": "Books_And_Reference",
+      "Installs": 100000,
+      "Growth_Pct": 0.0,
+      "High_Growth": false
+    },
+    {
+      "Month": "2017-08",
+      "Category": "Books_And_Reference",
+      "Installs": 10010000,
+      "Growth_Pct": 9910.0,
+      "High_Growth": true
+    },
+    {
+      "Month": "2017-11",
+      "Category": "Books_And_Reference",
+      "Installs": 2000000,
+      "Growth_Pct": -80.02,
+      "High_Growth": false
+    },
+    {
+      "Month": "2018-04",
+      "Category": "Books_And_Reference",
+      "Installs": 1050000,
+      "Growth_Pct": -47.5,
+      "High_Growth": false
+    },
+    {
+      "Month": "2018-05",
+      "Category": "Books_And_Reference",
+      "Installs": 40600000,
+      "Growth_Pct": 3766.67,
+      "High_Growth": true
+    },
+    {
+      "Month": "2018-06",
+      "Category": "Books_And_Reference",
+      "Installs": 47100000,
+      "Growth_Pct": 16.01,
+      "High_Growth": false
+    },
+    {
+      "Month": "2018-07",
+      "Category": "Books_And_Reference",
+      "Installs": 101600000,
+      "Growth_Pct": 115.71,
+      "High_Growth": true
+    },
+    {
+      "Month": "2018-08",
+      "Category": "Books_And_Reference",
+      "Installs": 110050000,
+      "Growth_Pct": 8.32,
+      "High_Growth": false
+    },
+    {
+      "Month": "2017-03",
+      "Category": "Comics",
+      "Installs": 100000,
+      "Growth_Pct": 0.0,
+      "High_Growth": false
+    },
+    {
+      "Month": "2018-05",
+      "Category": "Comics",
+      "Installs": 100000,
+      "Growth_Pct": 0.0,
+      "High_Growth": false
+    },
+    {
+      "Month": "2018-07",
+      "Category": "Comics",
+      "Installs": 6000000,
+      "Growth_Pct": 5900.0,
+      "High_Growth": true
+    },
+    {
+      "Month": "2018-08",
+      "Category": "Comics",
+      "Installs": 5050000,
+      "Growth_Pct": -15.83,
+      "High_Growth": false
+    },
+    {
+      "Month": "2014-01",
+      "Category": "Communication",
+      "Installs": 100000,
+      "Growth_Pct": 0.0,
+      "High_Growth": false
+    },
+    {
+      "Month": "2014-03",
+      "Category": "Communication",
+      "Installs": 100000,
+      "Growth_Pct": 0.0,
+      "High_Growth": false
+    },
+    {
+      "Month": "2014-07",
+      "Category": "Communication",
+      "Installs": 10000000,
+      "Growth_Pct": 9900.0,
+      "High_Growth": true
+    },
+    {
+      "Month": "2015-03",
+      "Category": "Communication",
+      "Installs": 1000000,
+      "Growth_Pct": -90.0,
+      "High_Growth": false
+    },
+    {
+      "Month": "2015-08",
+      "Category": "Communication",
+      "Installs": 2000000,
+      "Growth_Pct": 100.0,
+      "High_Growth": true
+    },
+    {
+      "Month": "2016-06",
+      "Category": "Communication",
+      "Installs": 1000000,
+      "Growth_Pct": -50.0,
+      "High_Growth": false
+    },
+    {
+      "Month": "2016-07",
+      "Category": "Communication",
+      "Installs": 110000,
+      "Growth_Pct": -89.0,
+      "High_Growth": false
+    },
+    {
+      "Month": "2016-09",
+      "Category": "Communication",
+      "Installs": 1000000,
+      "Growth_Pct": 809.09,
+      "High_Growth": true
+    },
+    {
+      "Month": "2016-11",
+      "Category": "Communication",
+      "Installs": 11000000,
+      "Growth_Pct": 1000.0,
+      "High_Growth": true
+    },
+    {
+      "Month": "2017-04",
+      "Category": "Communication",
+      "Installs": 100000,
+      "Growth_Pct": -99.09,
+      "High_Growth": false
+    },
+    {
+      "Month": "2017-09",
+      "Category": "Communication",
+      "Installs": 50000,
+      "Growth_Pct": -50.0,
+      "High_Growth": false
+    },
+    {
+      "Month": "2017-11",
+      "Category": "Communication",
+      "Installs": 5000000,
+      "Growth_Pct": 9900.0,
+      "High_Growth": true
+    },
+    {
+      "Month": "2018-01",
+      "Category": "Communication",
+      "Installs": 16000000,
+      "Growth_Pct": 220.0,
+      "High_Growth": true
+    },
+    {
+      "Month": "2018-03",
+      "Category": "Communication",
+      "Installs": 10100000,
+      "Growth_Pct": -36.88,
+      "High_Growth": false
+    },
+    {
+      "Month": "2018-04",
+      "Category": "Communication",
+      "Installs": 1000000,
+      "Growth_Pct": -90.1,
+      "High_Growth": false
+    },
+    {
+      "Month": "2018-05",
+      "Category": "Communication",
+      "Installs": 5000000,
+      "Growth_Pct": 400.0,
+      "High_Growth": true
+    },
+    {
+      "Month": "2018-06",
+      "Category": "Communication",
+      "Installs": 11100000,
+      "Growth_Pct": 122.0,
+      "High_Growth": true
+    },
+    {
+      "Month": "2018-07",
+      "Category": "Communication",
+      "Installs": 315730000,
+      "Growth_Pct": 2744.41,
+      "High_Growth": true
+    },
+    {
+      "Month": "2018-08",
+      "Category": "Communication",
+      "Installs": 1298510000,
+      "Growth_Pct": 311.27,
+      "High_Growth": true
+    },
+    {
+      "Month": "2014-07",
+      "Category": "Education",
+      "Installs": 10000,
+      "Growth_Pct": 0.0,
+      "High_Growth": false
+    },
+    {
+      "Month": "2015-01",
+      "Category": "Education",
+      "Installs": 100000,
+      "Growth_Pct": 900.0,
+      "High_Growth": true
+    },
+    {
+      "Month": "2015-06",
+      "Category": "Education",
+      "Installs": 1000000,
+      "Growth_Pct": 900.0,
+      "High_Growth": true
+    },
+    {
+      "Month": "2015-08",
+      "Category": "Education",
+      "Installs": 1000000,
+      "Growth_Pct": 0.0,
+      "High_Growth": false
+    },
+    {
+      "Month": "2016-09",
+      "Category": "Education",
+      "Installs": 1000000,
+      "Growth_Pct": 0.0,
+      "High_Growth": false
+    },
+    {
+      "Month": "2016-12",
+      "Category": "Education",
+      "Installs": 100000,
+      "Growth_Pct": -90.0,
+      "High_Growth": false
+    },
+    {
+      "Month": "2017-08",
+      "Category": "Education",
+      "Installs": 1000000,
+      "Growth_Pct": 900.0,
+      "High_Growth": true
+    },
+    {
+      "Month": "2017-10",
+      "Category": "Education",
+      "Installs": 1000000,
+      "Growth_Pct": 0.0,
+      "High_Growth": false
+    },
+    {
+      "Month": "2017-12",
+      "Category": "Education",
+      "Installs": 3000000,
+      "Growth_Pct": 200.0,
+      "High_Growth": true
+    },
+    {
+      "Month": "2018-05",
+      "Category": "Education",
+      "Installs": 2100000,
+      "Growth_Pct": -30.0,
+      "High_Growth": false
+    },
+    {
+      "Month": "2018-07",
+      "Category": "Education",
+      "Installs": 29600000,
+      "Growth_Pct": 1309.52,
+      "High_Growth": true
+    },
+    {
+      "Month": "2018-08",
+      "Category": "Education",
+      "Installs": 2000000,
+      "Growth_Pct": -93.24,
+      "High_Growth": false
+    },
+    {
+      "Month": "2015-09",
+      "Category": "Entertainment",
+      "Installs": 1000000,
+      "Growth_Pct": 0.0,
+      "High_Growth": false
+    },
+    {
+      "Month": "2016-04",
+      "Category": "Entertainment",
+      "Installs": 10000000,
+      "Growth_Pct": 900.0,
+      "High_Growth": true
+    },
+    {
+      "Month": "2016-09",
+      "Category": "Entertainment",
+      "Installs": 10000000,
+      "Growth_Pct": 0.0,
+      "High_Growth": false
+    },
+    {
+      "Month": "2018-01",
+      "Category": "Entertainment",
+      "Installs": 20000000,
+      "Growth_Pct": 100.0,
+      "High_Growth": true
+    },
+    {
+      "Month": "2018-03",
+      "Category": "Entertainment",
+      "Installs": 10000000,
+      "Growth_Pct": -50.0,
+      "High_Growth": false
+    },
+    {
+      "Month": "2018-05",
+      "Category": "Entertainment",
+      "Installs": 6000000,
+      "Growth_Pct": -40.0,
+      "High_Growth": false
+    },
+    {
+      "Month": "2018-06",
+      "Category": "Entertainment",
+      "Installs": 21100000,
+      "Growth_Pct": 251.67,
+      "High_Growth": true
+    },
+    {
+      "Month": "2018-07",
+      "Category": "Entertainment",
+      "Installs": 380800000,
+      "Growth_Pct": 1704.74,
+      "High_Growth": true
+    },
+    {
+      "Month": "2018-08",
+      "Category": "Entertainment",
+      "Installs": 67200000,
+      "Growth_Pct": -82.35,
+      "High_Growth": false
+    },
+    {
+      "Month": "2018-05",
+      "Category": "Events",
+      "Installs": 10000,
+      "Growth_Pct": 0.0,
+      "High_Growth": false
+    },
+    {
+      "Month": "2018-06",
+      "Category": "Events",
+      "Installs": 500000,
+      "Growth_Pct": 4900.0,
+      "High_Growth": true
+    },
+    {
+      "Month": "2018-07",
+      "Category": "Events",
+      "Installs": 1100000,
+      "Growth_Pct": 120.0,
+      "High_Growth": true
+    },
+    {
+      "Month": "2018-03",
+      "Category": "सौंदर्य (Beauty)",
+      "Installs": 5000,
+      "Growth_Pct": 0.0,
+      "High_Growth": false
+    },
+    {
+      "Month": "2018-06",
+      "Category": "सौंदर्य (Beauty)",
+      "Installs": 1000000,
+      "Growth_Pct": 19900.0,
+      "High_Growth": true
+    },
+    {
+      "Month": "2018-07",
+      "Category": "सौंदर्य (Beauty)",
+      "Installs": 1000000,
+      "Growth_Pct": 0.0,
+      "High_Growth": false
+    },
+    {
+      "Month": "2018-08",
+      "Category": "सौंदर्य (Beauty)",
+      "Installs": 100000,
+      "Growth_Pct": -90.0,
+      "High_Growth": false
+    },
+    {
+      "Month": "2014-05",
+      "Category": "வணிகம் (Business)",
+      "Installs": 100000,
+      "Growth_Pct": 0.0,
+      "High_Growth": false
+    },
+    {
+      "Month": "2015-09",
+      "Category": "வணிகம் (Business)",
+      "Installs": 100000,
+      "Growth_Pct": 0.0,
+      "High_Growth": false
+    },
+    {
+      "Month": "2016-02",
+      "Category": "வணிகம் (Business)",
+      "Installs": 10000,
+      "Growth_Pct": -90.0,
+      "High_Growth": false
+    },
+    {
+      "Month": "2016-03",
+      "Category": "வணிகம் (Business)",
+      "Installs": 1000000,
+      "Growth_Pct": 9900.0,
+      "High_Growth": true
+    },
+    {
+      "Month": "2017-09",
+      "Category": "வணிகம் (Business)",
+      "Installs": 1000000,
+      "Growth_Pct": 0.0,
+      "High_Growth": false
+    },
+    {
+      "Month": "2017-11",
+      "Category": "வணிகம் (Business)",
+      "Installs": 500000,
+      "Growth_Pct": -50.0,
+      "High_Growth": false
+    },
+    {
+      "Month": "2017-12",
+      "Category": "வணிகம் (Business)",
+      "Installs": 1001000,
+      "Growth_Pct": 100.2,
+      "High_Growth": true
+    },
+    {
+      "Month": "2018-02",
+      "Category": "வணிகம் (Business)",
+      "Installs": 1000000,
+      "Growth_Pct": -0.1,
+      "High_Growth": false
+    },
+    {
+      "Month": "2018-05",
+      "Category": "வணிகம் (Business)",
+      "Installs": 100000,
+      "Growth_Pct": -90.0,
+      "High_Growth": false
+    },
+    {
+      "Month": "2018-06",
+      "Category": "வணிகம் (Business)",
+      "Installs": 15200000,
+      "Growth_Pct": 15100.0,
+      "High_Growth": true
+    },
+    {
+      "Month": "2018-07",
+      "Category": "வணிகம் (Business)",
+      "Installs": 11600000,
+      "Growth_Pct": -23.68,
+      "High_Growth": false
+    },
+    {
+      "Month": "2018-08",
+      "Category": "வணிகம் (Business)",
+      "Installs": 115100000,
+      "Growth_Pct": 892.24,
+      "High_Growth": true
+    }
+  ],
+  "task5": {
+    "months": [
+      "2014-11",
+      "2016-10",
+      "2016-12",
+      "2017-03",
+      "2017-06",
+      "2017-07",
+      "2017-08",
+      "2017-09",
+      "2017-10",
+      "2017-12",
+      "2018-01",
+      "2018-02",
+      "2018-03",
+      "2018-04",
+      "2018-05",
+      "2018-06",
+      "2018-07",
+      "2018-08"
+    ],
+    "categories": {
+      "Parenting": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        100000,
+        100000,
+        10100000,
+        10100000,
+        10700000,
+        10700000
+      ],
+      "Personalization": [
+        0,
+        0,
+        1000000,
+        1000000,
+        1000000,
+        1000000,
+        1000000,
+        2000000,
+        2000000,
+        2000000,
+        12000000,
+        22000000,
+        22000000,
+        22000000,
+        22000000,
+        32000000,
+        43500000,
+        63500000
+      ],
+      "Productividad (Spanish)": [
+        0,
+        1000000,
+        1000000,
+        1000000,
+        1000000,
+        1000000,
+        1000000,
+        1000000,
+        1000000,
+        1000000,
+        1000000,
+        1100000,
+        1100000,
+        1100000,
+        1100000,
+        16100000,
+        182100000,
+        787100000
+      ],
+      "Tools": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        50000,
+        50000,
+        50000,
+        50000,
+        1050000,
+        1050000,
+        1050000,
+        1050000,
+        11050000,
+        11050000,
+        233650000,
+        353650000
+      ],
+      "Voyages et local (French)": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        50000,
+        50000,
+        50000,
+        50000,
+        50000,
+        5050000,
+        5050000,
+        11050000,
+        42150000,
+        77250000
+      ],
+      "写真 (Japanese)": [
+        1000000,
+        1000000,
+        1000000,
+        51000000,
+        61000000,
+        76000000,
+        76000000,
+        76000000,
+        81000000,
+        91000000,
+        101000000,
+        101000000,
+        103000000,
+        103000000,
+        114000000,
+        185000000,
+        443000000,
+        969500000
+      ]
+    },
+    "high_growth_months": [
+      "2016-10",
+      "2016-12",
+      "2017-03",
+      "2017-07",
+      "2017-08",
+      "2017-09",
+      "2017-10",
+      "2017-12",
+      "2018-01",
+      "2018-02",
+      "2018-03",
+      "2018-04",
+      "2018-05",
+      "2018-06",
+      "2018-07",
+      "2018-08"
+    ]
+  },
+  "task6": [
+    {
+      "Category": "SPORTS",
+      "Avg_Rating": 4.34,
+      "Total_Reviews_M": 1.98,
+      "Total_Installs": 120511000
+    },
+    {
+      "Category": "GAME",
+      "Avg_Rating": 4.25,
+      "Total_Reviews_M": 2.41,
+      "Total_Installs": 117291000
+    },
+    {
+      "Category": "FAMILY",
+      "Avg_Rating": 4.19,
+      "Total_Reviews_M": 3.01,
+      "Total_Installs": 111220820
+    },
+    {
+      "Category": "ENTERTAINMENT",
+      "Avg_Rating": 4.3,
+      "Total_Reviews_M": 0.87,
+      "Total_Installs": 21000000
+    },
+    {
+      "Category": "PERSONALIZATION",
+      "Avg_Rating": 4.47,
+      "Total_Reviews_M": 0.16,
+      "Total_Installs": 15060000
+    },
+    {
+      "Category": "LIFESTYLE",
+      "Avg_Rating": 4.05,
+      "Total_Reviews_M": 0.05,
+      "Total_Installs": 6171500
+    },
+    {
+      "Category": "EDUCATION",
+      "Avg_Rating": 4.4,
+      "Total_Reviews_M": 0.06,
+      "Total_Installs": 2000000
+    },
+    {
+      "Category": "COMMUNICATION",
+      "Avg_Rating": 4.05,
+      "Total_Reviews_M": 0.02,
+      "Total_Installs": 1010000
+    },
+    {
+      "Category": "SHOPPING",
+      "Avg_Rating": 4.2,
+      "Total_Reviews_M": 0.01,
+      "Total_Installs": 1000000
+    },
+    {
+      "Category": "ART_AND_DESIGN",
+      "Avg_Rating": 4.1,
+      "Total_Reviews_M": 0.0,
+      "Total_Installs": 620000
+    }
+  ],
+  "task7": [
+    {
+      "Category": "FAMILY",
+      "Type": "Free",
+      "Avg_Installs": 6423557.0,
+      "Avg_Revenue": 0.0,
+      "App_Count": 194
+    },
+    {
+      "Category": "FAMILY",
+      "Type": "Paid",
+      "Avg_Installs": 361667.0,
+      "Avg_Revenue": 597216.67,
+      "App_Count": 6
+    },
+    {
+      "Category": "GAME",
+      "Type": "Free",
+      "Avg_Installs": 33194896.0,
+      "Avg_Revenue": 0.0,
+      "App_Count": 96
+    },
+    {
+      "Category": "GAME",
+      "Type": "Paid",
+      "Avg_Installs": 67143.0,
+      "Avg_Revenue": 276471.43,
+      "App_Count": 7
+    },
+    {
+      "Category": "SPORTS",
+      "Type": "Free",
+      "Avg_Installs": 4165735.0,
+      "Avg_Revenue": 0.0,
+      "App_Count": 68
+    },
+    {
+      "Category": "SPORTS",
+      "Type": "Paid",
+      "Avg_Installs": 30000.0,
+      "Avg_Revenue": 774700.0,
+      "App_Count": 2
+    }
+  ],
+  "core": {
+    "c1": [
+      {
+        "Category": "FAMILY",
+        "Count": 1832
+      },
+      {
+        "Category": "GAME",
+        "Count": 959
+      },
+      {
+        "Category": "TOOLS",
+        "Count": 827
+      },
+      {
+        "Category": "BUSINESS",
+        "Count": 420
+      },
+      {
+        "Category": "MEDICAL",
+        "Count": 395
+      },
+      {
+        "Category": "PERSONALIZATION",
+        "Count": 376
+      },
+      {
+        "Category": "PRODUCTIVITY",
+        "Count": 374
+      },
+      {
+        "Category": "LIFESTYLE",
+        "Count": 369
+      },
+      {
+        "Category": "FINANCE",
+        "Count": 345
+      },
+      {
+        "Category": "SPORTS",
+        "Count": 325
+      },
+      {
+        "Category": "COMMUNICATION",
+        "Count": 315
+      },
+      {
+        "Category": "HEALTH_AND_FITNESS",
+        "Count": 288
+      },
+      {
+        "Category": "PHOTOGRAPHY",
+        "Count": 281
+      },
+      {
+        "Category": "NEWS_AND_MAGAZINES",
+        "Count": 254
+      },
+      {
+        "Category": "SOCIAL",
+        "Count": 239
+      }
+    ],
+    "c2": [
+      {
+        "Type": "Free",
+        "Count": 8903
+      },
+      {
+        "Type": "Paid",
+        "Count": 756
+      }
+    ],
+    "c3": {
+      "mean": 4.17,
+      "median": 4.3,
+      "bins": [
+        1.0,
+        1.2,
+        1.4,
+        1.6,
+        1.8,
+        2.0,
+        2.2,
+        2.4,
+        2.6,
+        2.8,
+        3.0,
+        3.2,
+        3.4,
+        3.6,
+        3.8,
+        4.0,
+        4.2,
+        4.4,
+        4.6,
+        4.8,
+        5.0
+      ],
+      "counts": [
+        16,
+        1,
+        6,
+        12,
+        19,
+        20,
+        53,
+        20,
+        47,
+        85,
+        150,
+        289,
+        156,
+        677,
+        359,
+        1134,
+        1707,
+        1743,
+        1346,
+        356
+      ]
+    },
+    "c4": [
+      {
+        "Sentiment": "Positive",
+        "Count": 23998
+      },
+      {
+        "Sentiment": "Negative",
+        "Count": 8271
+      },
+      {
+        "Sentiment": "Neutral",
+        "Count": 5163
+      }
+    ],
+    "c5": [
+      {
+        "Category": "GAME",
+        "Installs": 13878924415
+      },
+      {
+        "Category": "COMMUNICATION",
+        "Installs": 11038276251
+      },
+      {
+        "Category": "TOOLS",
+        "Installs": 8001771915
+      },
+      {
+        "Category": "PRODUCTIVITY",
+        "Installs": 5793091369
+      },
+      {
+        "Category": "SOCIAL",
+        "Installs": 5487867902
+      },
+      {
+        "Category": "PHOTOGRAPHY",
+        "Installs": 4649147655
+      },
+      {
+        "Category": "FAMILY",
+        "Installs": 4427941505
+      },
+      {
+        "Category": "VIDEO_PLAYERS",
+        "Installs": 3926902720
+      },
+      {
+        "Category": "TRAVEL_AND_LOCAL",
+        "Installs": 2894887146
+      },
+      {
+        "Category": "NEWS_AND_MAGAZINES",
+        "Installs": 2369217760
+      },
+      {
+        "Category": "ENTERTAINMENT",
+        "Installs": 2113660000
+      },
+      {
+        "Category": "BOOKS_AND_REFERENCE",
+        "Installs": 1665969576
+      }
+    ],
+    "c6": [
+      {
+        "Year": 2010,
+        "Count": 1
+      },
+      {
+        "Year": 2011,
+        "Count": 15
+      },
+      {
+        "Year": 2012,
+        "Count": 26
+      },
+      {
+        "Year": 2013,
+        "Count": 108
+      },
+      {
+        "Year": 2014,
+        "Count": 203
+      },
+      {
+        "Year": 2015,
+        "Count": 449
+      },
+      {
+        "Year": 2016,
+        "Count": 779
+      },
+      {
+        "Year": 2017,
+        "Count": 1794
+      },
+      {
+        "Year": 2018,
+        "Count": 6284
+      }
+    ],
+    "c7": [
+      {
+        "Category": "FAMILY",
+        "Revenue": 113679845.36
+      },
+      {
+        "Category": "LIFESTYLE",
+        "Revenue": 57583939.4
+      },
+      {
+        "Category": "GAME",
+        "Revenue": 40688636.85
+      },
+      {
+        "Category": "FINANCE",
+        "Revenue": 25726678.98
+      },
+      {
+        "Category": "PHOTOGRAPHY",
+        "Revenue": 8547767.7
+      },
+      {
+        "Category": "PERSONALIZATION",
+        "Revenue": 6796947.56
+      },
+      {
+        "Category": "MEDICAL",
+        "Revenue": 5957535.67
+      },
+      {
+        "Category": "TOOLS",
+        "Revenue": 5464820.59
+      },
+      {
+        "Category": "SPORTS",
+        "Revenue": 4706211.95
+      },
+      {
+        "Category": "PRODUCTIVITY",
+        "Revenue": 4313374.95
+      }
+    ],
+    "c8": [
+      {
+        "Genre": "Tools",
+        "Count": 826
+      },
+      {
+        "Genre": "Entertainment",
+        "Count": 561
+      },
+      {
+        "Genre": "Education",
+        "Count": 510
+      },
+      {
+        "Genre": "Business",
+        "Count": 420
+      },
+      {
+        "Genre": "Medical",
+        "Count": 395
+      },
+      {
+        "Genre": "Personalization",
+        "Count": 376
+      },
+      {
+        "Genre": "Productivity",
+        "Count": 374
+      },
+      {
+        "Genre": "Lifestyle",
+        "Count": 368
+      },
+      {
+        "Genre": "Finance",
+        "Count": 345
+      },
+      {
+        "Genre": "Sports",
+        "Count": 331
+      },
+      {
+        "Genre": "Communication",
+        "Count": 315
+      },
+      {
+        "Genre": "Action",
+        "Count": 299
+      },
+      {
+        "Genre": "Health & Fitness",
+        "Count": 288
+      },
+      {
+        "Genre": "Photography",
+        "Count": 281
+      },
+      {
+        "Genre": "News & Magazines",
+        "Count": 254
+      }
+    ],
+    "c9": [
+      {
+        "Month": "Jan",
+        "Count": 469
+      },
+      {
+        "Month": "Feb",
+        "Count": 517
+      },
+      {
+        "Month": "Mar",
+        "Count": 640
+      },
+      {
+        "Month": "Apr",
+        "Count": 575
+      },
+      {
+        "Month": "May",
+        "Count": 927
+      },
+      {
+        "Month": "Jun",
+        "Count": 1170
+      },
+      {
+        "Month": "Jul",
+        "Count": 2612
+      },
+      {
+        "Month": "Aug",
+        "Count": 1285
+      },
+      {
+        "Month": "Sep",
+        "Count": 306
+      },
+      {
+        "Month": "Oct",
+        "Count": 380
+      },
+      {
+        "Month": "Nov",
+        "Count": 362
+      },
+      {
+        "Month": "Dec",
+        "Count": 416
+      }
+    ],
+    "c10": [
+      {
+        "Type": "Free",
+        "Avg_Rating": 4.166372497365648,
+        "Avg_Price": 0.0,
+        "Avg_Installs": 8431491.929237336,
+        "Count": 8903
+      },
+      {
+        "Type": "Paid",
+        "Avg_Rating": 4.259602649006623,
+        "Avg_Price": 14.045145502645504,
+        "Avg_Installs": 75879.47222222222,
+        "Count": 756
+      }
+    ]
+  }
+};
+
+        let timeOverride = true; // Default to true so user can view all charts immediately!
+
+        const DARK_THEME = {
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { color: '#94a3b8', family: 'Plus Jakarta Sans, sans-serif' },
+            xaxis: { gridcolor: '#1f293d', zerolinecolor: '#1f293d' },
+            yaxis: { gridcolor: '#1f293d', zerolinecolor: '#1f293d' },
+            margin: { l: 60, r: 30, t: 40, b: 50 }
+        };
+
+        // IST Time Windows (in minutes from midnight)
+        // Task 2: 5 PM - 7 PM (17:00 - 19:00) -> 1020 to 1140
+        // Task 3: 6 PM - 8 PM (18:00 - 20:00) -> 1080 to 1200
+        // Task 4: 6 PM - 9 PM (18:00 - 21:00) -> 1080 to 1260
+        // Task 5: 4 PM - 6 PM (16:00 - 18:00) -> 960 to 1080
+        // Task 6: 3 PM - 5 PM (15:00 - 17:00) -> 900 to 1020
+        // Task 7: 1 PM - 2 PM (13:00 - 14:00) -> 780 to 840
+        const WINDOWS = {
+            task2: { start: 17 * 60, end: 19 * 60, label: '5:00 PM – 7:00 PM IST' },
+            task3: { start: 18 * 60, end: 20 * 60, label: '6:00 PM – 8:00 PM IST' },
+            task4: { start: 18 * 60, end: 21 * 60, label: '6:00 PM – 9:00 PM IST' },
+            task5: { start: 16 * 60, end: 18 * 60, label: '4:00 PM – 6:00 PM IST' },
+            task6: { start: 15 * 60, end: 17 * 60, label: '3:00 PM – 5:00 PM IST' },
+            task7: { start: 13 * 60, end: 14 * 60, label: '1:00 PM – 2:00 PM IST' }
+        };
+
+        function getISTNow() {
+            const now = new Date();
+            const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+            return new Date(utc + (3600000 * 5.5));
+        }
+
+        function updateClock() {
+            const ist = getISTNow();
+            const timeStr = ist.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+            document.getElementById('live-ist-clock').innerText = `IST: ${timeStr}`;
+
+            const currentMinutes = ist.getHours() * 60 + ist.getMinutes();
+
+            Object.keys(WINDOWS).forEach(key => {
+                const win = WINDOWS[key];
+                const isOpen = (currentMinutes >= win.start && currentMinutes < win.end);
+                const tagEl = document.getElementById(`tag-${key}`);
+                const overlayEl = document.getElementById(`overlay-${key}`);
+                const timerEl = document.getElementById(`timer-${key}`);
+
+                if (timeOverride || isOpen) {
+                    tagEl.className = 'timing-tag timing-active';
+                    tagEl.innerHTML = `<span>●</span> <span>${win.label} (Active)</span>`;
+                    overlayEl.classList.remove('show');
+                } else {
+                    tagEl.className = 'timing-tag timing-locked';
+                    tagEl.innerHTML = `<span>🔒</span> <span>${win.label} (Locked)</span>`;
+                    overlayEl.classList.add('show');
+                    
+                    let diff = win.start - currentMinutes;
+                    if (diff < 0) diff += 24 * 60;
+                    const hrs = Math.floor(diff / 60);
+                    const mins = diff % 60;
+                    timerEl.innerText = `Unlocks in: ${hrs}h ${mins}m`;
+                }
+            });
+        }
+
+        function toggleTimeOverride() {
+            timeOverride = !timeOverride;
+            const btn = document.getElementById('btn-toggle-override');
+            const btnText = document.getElementById('override-btn-text');
+            if (timeOverride) {
+                btn.classList.add('active');
+                btnText.innerText = 'Time Override Active (All Shown)';
+            } else {
+                btn.classList.remove('active');
+                btnText.innerText = 'Enable Time Override (Show All)';
+            }
+            updateClock();
+        }
+
+        function switchSection(sec) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            const tEl = document.getElementById('section-tasks');
+            const cEl = document.getElementById('section-core');
+
+            if (sec === 'tasks') {
+                tEl.style.display = 'block';
+                cEl.style.display = 'none';
+            } else if (sec === 'core') {
+                tEl.style.display = 'none';
+                cEl.style.display = 'block';
+            } else {
+                tEl.style.display = 'block';
+                cEl.style.display = 'block';
+            }
+            window.dispatchEvent(new Event('resize'));
+        }
+
+        // ================= RENDERING PLOTS =================
+        function renderAllPlots() {
+            renderTask2Plot();
+            renderTask3Plot('map');
+            renderTask4Plot();
+            renderTask5Plot();
+            renderTask6Plot();
+            renderTask7Plot();
+            renderCorePlots();
+        }
+
+        // TASK 2: Bubble Chart
+        function renderTask2Plot() {
+            const data = DB_DATA.task2;
+            const cats = [...new Set(data.map(d => d.Graph_Category))];
+            
+            // Populate category filter dropdown
+            const select = document.getElementById('filter-task2-cat');
+            if (select.children.length === 1) {
+                cats.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c;
+                    opt.innerText = c;
+                    select.appendChild(opt);
+                });
+            }
+
+            filterTask2Bubble();
+        }
+
+        function filterTask2Bubble() {
+            const selectedCat = document.getElementById('filter-task2-cat').value;
+            let data = DB_DATA.task2;
+            if (selectedCat !== 'ALL') {
+                data = data.filter(d => d.Graph_Category === selectedCat);
+            }
+
+            const cats = [...new Set(data.map(d => d.Graph_Category))];
+            const maxInstalls = Math.max(...data.map(d => d.Installs));
+
+            const traces = cats.map(cat => {
+                const subset = data.filter(d => d.Graph_Category === cat);
+                const isGame = cat.toLowerCase().includes('game');
+                return {
+                    x: subset.map(d => d.Size_MB),
+                    y: subset.map(d => d.Rating),
+                    text: subset.map(d => `<b>${d.App}</b><br>Category: ${d.Graph_Category}<br>Installs: ${d.Installs.toLocaleString()}<br>Reviews: ${d.Reviews.toLocaleString()}<br>Size: ${d.Size_MB} MB<br>Rating: ${d.Rating}<br>Subjectivity: ${d.Sentiment_Subjectivity}`),
+                    hoverinfo: 'text',
+                    mode: 'markers',
+                    name: cat,
+                    marker: {
+                        size: subset.map(d => Math.max(12, Math.sqrt(d.Installs) / 280)),
+                        color: isGame ? '#ec4899' : undefined,
+                        opacity: 0.8,
+                        line: { width: 1.5, color: '#ffffff' }
+                    }
+                };
+            });
+
+            const layout = {
+                ...DARK_THEME,
+                title: 'Task 2: App Size (MB) vs Average Rating (Bubble = Installs)',
+                xaxis: { ...DARK_THEME.xaxis, title: 'App Size (MB)' },
+                yaxis: { ...DARK_THEME.yaxis, title: 'Average Rating (Above 3.5)', range: [3.45, 5.05] },
+                legend: { orientation: 'h', y: -0.2 }
+            };
+
+            Plotly.newPlot('plot-task2', traces, layout, { responsive: true });
+        }
+
+        // TASK 3: Choropleth Map & Top 5 Bar
+        function toggleTask3View() {
+            const mode = document.getElementById('filter-task3-view').value;
+            renderTask3Plot(mode);
+        }
+
+        function renderTask3Plot(mode) {
+            if (mode === 'map') {
+                const countries = DB_DATA.task3_countries;
+                const trace = {
+                    type: 'choropleth',
+                    locations: countries.map(d => d.iso),
+                    z: countries.map(d => d.installs),
+                    text: countries.map(d => `<b>${d.country}</b><br>Global Installs: ${d.installs.toLocaleString()}<br>Top Category: ${d.top_category}`),
+                    hoverinfo: 'text',
+                    colorscale: [
+                        [0, '#1e3a8a'],
+                        [0.3, '#2563eb'],
+                        [0.7, '#06b6d4'],
+                        [1, '#10b981']
+                    ],
+                    colorbar: {
+                        title: 'Total Installs',
+                        tickfont: { color: '#94a3b8' },
+                        titlefont: { color: '#94a3b8' }
+                    },
+                    marker: { line: { color: '#111827', width: 0.8 } }
+                };
+
+                const layout = {
+                    ...DARK_THEME,
+                    title: 'Task 3: Global Installs Choropleth Map by Country',
+                    geo: {
+                        bgcolor: 'rgba(0,0,0,0)',
+                        showcoastlines: true,
+                        coastlinecolor: '#334155',
+                        showland: true,
+                        landcolor: '#1e293b',
+                        showocean: true,
+                        oceancolor: '#0b0f19',
+                        showcountries: true,
+                        countrycolor: '#334155',
+                        projection: { type: 'natural earth' }
+                    }
+                };
+
+                Plotly.newPlot('plot-task3', [trace], layout, { responsive: true });
+            } else {
+                const data = DB_DATA.task3_top5;
+                const trace = {
+                    x: data.map(d => d.Category),
+                    y: data.map(d => d.Installs),
+                    type: 'bar',
+                    marker: {
+                        color: data.map(d => d.Highlight === 'Above 1 Million' ? '#10b981' : '#f59e0b')
+                    },
+                    text: data.map(d => `${(d.Installs / 1e9).toFixed(2)} Billion (${d.Highlight})`),
+                    textposition: 'outside',
+                    hoverinfo: 'x+text'
+                };
+
+                const layout = {
+                    ...DARK_THEME,
+                    title: 'Task 3: Top 5 App Categories by Total Installs (>1M Threshold)',
+                    xaxis: { ...DARK_THEME.xaxis, title: 'Category (Excluding A, C, G, S)' },
+                    yaxis: { ...DARK_THEME.yaxis, title: 'Total Installs' }
+                };
+
+                Plotly.newPlot('plot-task3', [trace], layout, { responsive: true });
+            }
+        }
+
+        // TASK 4: Time Series Line Chart with 20% Growth Shading
+        function renderTask4Plot() {
+            const data = DB_DATA.task4;
+            const cats = [...new Set(data.map(d => d.Category))];
+
+            const traces = cats.map(cat => {
+                const sub = data.filter(d => d.Category === cat);
+                return {
+                    x: sub.map(d => d.Month),
+                    y: sub.map(d => d.Installs),
+                    text: sub.map(d => `Month: ${d.Month}<br>Installs: ${d.Installs.toLocaleString()}<br>MoM Growth: ${d.Growth_Pct}%${d.High_Growth ? ' 🚀 (>20% Highlight)' : ''}`),
+                    hoverinfo: 'text',
+                    mode: 'lines+markers',
+                    name: cat,
+                    line: { width: 2.5 }
+                };
+            });
+
+            // Identify shapes for shaded areas where growth > 20%
+            const shapes = [];
+            data.filter(d => d.High_Growth).forEach(d => {
+                shapes.push({
+                    type: 'rect',
+                    xref: 'x',
+                    yref: 'paper',
+                    x0: d.Month,
+                    x1: d.Month,
+                    y0: 0,
+                    y1: 1,
+                    fillcolor: 'rgba(16, 185, 129, 0.25)',
+                    line: { width: 1.5, color: '#10b981', dash: 'dot' }
+                });
+            });
+
+            const layout = {
+                ...DARK_THEME,
+                title: 'Task 4: Total Installs Trend Segmented by Category (Shaded > 20% Growth)',
+                xaxis: { ...DARK_THEME.xaxis, title: 'Month' },
+                yaxis: { ...DARK_THEME.yaxis, title: 'Total Monthly Installs' },
+                shapes: shapes,
+                legend: { orientation: 'h', y: -0.2 }
+            };
+
+            Plotly.newPlot('plot-task4', traces, layout, { responsive: true });
+        }
+
+        // TASK 5: Stacked Area Chart with 25% Growth Highlight
+        function renderTask5Plot() {
+            const task5 = DB_DATA.task5;
+            const months = task5.months;
+            const cats = Object.keys(task5.categories);
+
+            const traces = cats.map((cat, idx) => {
+                return {
+                    x: months,
+                    y: task5.categories[cat],
+                    name: cat,
+                    mode: 'lines',
+                    stackgroup: 'one',
+                    hoverinfo: 'x+y+name',
+                    line: { width: 1.5 }
+                };
+            });
+
+            const shapes = task5.high_growth_months.map(m => ({
+                type: 'rect',
+                xref: 'x',
+                yref: 'paper',
+                x0: m,
+                x1: m,
+                y0: 0,
+                y1: 1,
+                fillcolor: 'rgba(236, 72, 153, 0.25)',
+                line: { width: 2, color: '#ec4899', dash: 'dash' }
+            }));
+
+            const layout = {
+                ...DARK_THEME,
+                title: 'Task 5: Cumulative Installs Stacked Area Chart (>25% Growth Highlighted)',
+                xaxis: { ...DARK_THEME.xaxis, title: 'Timeline (Months)' },
+                yaxis: { ...DARK_THEME.yaxis, title: 'Cumulative Installs' },
+                shapes: shapes,
+                legend: { orientation: 'h', y: -0.25 }
+            };
+
+            Plotly.newPlot('plot-task5', traces, layout, { responsive: true });
+        }
+
+        // TASK 6: Grouped Bar Chart
+        function renderTask6Plot() {
+            const data = DB_DATA.task6;
+
+            const traceRating = {
+                x: data.map(d => d.Category),
+                y: data.map(d => d.Avg_Rating),
+                name: 'Average Rating (Scale 1–5)',
+                type: 'bar',
+                marker: { color: '#3b82f6' },
+                hoverinfo: 'x+y+name'
+            };
+
+            const traceReviews = {
+                x: data.map(d => d.Category),
+                y: data.map(d => d.Total_Reviews_M),
+                name: 'Total Reviews (Millions)',
+                type: 'bar',
+                marker: { color: '#10b981' },
+                hoverinfo: 'x+y+name'
+            };
+
+            const layout = {
+                ...DARK_THEME,
+                barmode: 'group',
+                title: 'Task 6: Avg Rating and Total Reviews for Top 10 Categories by Installs',
+                xaxis: { ...DARK_THEME.xaxis, title: 'App Category (Jan Update & Size >= 10M)' },
+                yaxis: { ...DARK_THEME.yaxis, title: 'Metrics (Rating / Millions of Reviews)' },
+                legend: { orientation: 'h', y: -0.25 }
+            };
+
+            Plotly.newPlot('plot-task6', [traceRating, traceReviews], layout, { responsive: true });
+        }
+
+        // TASK 7: Dual-Axis Chart (Free vs Paid)
+        function renderTask7Plot() {
+            const data = DB_DATA.task7;
+
+            const labels = data.map(d => `${d.Category} (${d.Type})`);
+            const installs = data.map(d => d.Avg_Installs);
+            const revenues = data.map(d => d.Avg_Revenue);
+
+            const traceInstalls = {
+                x: labels,
+                y: installs,
+                name: 'Average Installs',
+                type: 'bar',
+                marker: { color: '#3b82f6', opacity: 0.85 },
+                yaxis: 'y'
+            };
+
+            const traceRevenue = {
+                x: labels,
+                y: revenues,
+                name: 'Average Revenue ($)',
+                type: 'scatter',
+                mode: 'lines+markers',
+                marker: { size: 12, color: '#f59e0b' },
+                line: { width: 3, color: '#f59e0b' },
+                yaxis: 'y2'
+            };
+
+            const layout = {
+                ...DARK_THEME,
+                title: 'Task 7: Free vs Paid Dual-Axis Chart (Avg Installs & Revenue)',
+                xaxis: { ...DARK_THEME.xaxis, title: 'Category & Pricing Tier' },
+                yaxis: {
+                    ...DARK_THEME.yaxis,
+                    title: 'Average Installs',
+                    side: 'left'
+                },
+                yaxis2: {
+                    title: 'Average Revenue ($)',
+                    overlaying: 'y',
+                    side: 'right',
+                    gridcolor: 'transparent',
+                    font: { color: '#f59e0b' }
+                },
+                legend: { orientation: 'h', y: -0.25 }
+            };
+
+            Plotly.newPlot('plot-task7', [traceInstalls, traceRevenue], layout, { responsive: true });
+        }
+
+        // ================= CORE 10 PLOTS =================
+        function renderCorePlots() {
+            const core = DB_DATA.core;
+
+            // 1. Top Categories Distribution
+            Plotly.newPlot('plot-c1', [{
+                x: core.c1.map(d => d.Category),
+                y: core.c1.map(d => d.Count),
+                type: 'bar',
+                marker: { color: '#6366f1' }
+            }], { ...DARK_THEME, title: 'App Distribution Across Categories', xaxis: { ...DARK_THEME.xaxis, tickangle: -35 } }, { responsive: true });
+
+            // 2. Type Share (Free vs Paid)
+            Plotly.newPlot('plot-c2', [{
+                labels: core.c2.map(d => d.Type),
+                values: core.c2.map(d => d.Count),
+                type: 'pie',
+                hole: 0.55,
+                marker: { colors: ['#10b981', '#f59e0b'] }
+            }], { ...DARK_THEME, title: 'Free vs Paid Market Distribution' }, { responsive: true });
+
+            // 3. Rating Distribution
+            Plotly.newPlot('plot-c3', [{
+                x: core.c3.bins.slice(0, -1),
+                y: core.c3.counts,
+                type: 'bar',
+                marker: { color: '#06b6d4' }
+            }], { ...DARK_THEME, title: `Rating Distribution (Mean: ${core.c3.mean}, Median: ${core.c3.median})` }, { responsive: true });
+
+            // 4. Sentiment Breakdown
+            Plotly.newPlot('plot-c4', [{
+                labels: core.c4.map(d => d.Sentiment),
+                values: core.c4.map(d => d.Count),
+                type: 'pie',
+                marker: { colors: ['#10b981', '#64748b', '#ef4444'] }
+            }], { ...DARK_THEME, title: 'User Review Sentiments Breakdown' }, { responsive: true });
+
+            // 5. Installs by Category
+            Plotly.newPlot('plot-c5', [{
+                x: core.c5.map(d => d.Category),
+                y: core.c5.map(d => d.Installs),
+                type: 'bar',
+                marker: { color: '#ec4899' }
+            }], { ...DARK_THEME, title: 'Installs Volume by Category', xaxis: { ...DARK_THEME.xaxis, tickangle: -35 } }, { responsive: true });
+
+            // 6. Updates Over Time
+            Plotly.newPlot('plot-c6', [{
+                x: core.c6.map(d => d.Year),
+                y: core.c6.map(d => d.Count),
+                type: 'scatter',
+                mode: 'lines+markers',
+                fill: 'tozeroy',
+                line: { color: '#3b82f6', width: 3 }
+            }], { ...DARK_THEME, title: 'Yearly App Updates Trajectory' }, { responsive: true });
+
+            // 7. Revenue by Category
+            Plotly.newPlot('plot-c7', [{
+                x: core.c7.map(d => d.Category),
+                y: core.c7.map(d => d.Revenue),
+                type: 'bar',
+                marker: { color: '#f59e0b' }
+            }], { ...DARK_THEME, title: 'Total Revenue Generated by Top Categories ($)', xaxis: { ...DARK_THEME.xaxis, tickangle: -35 } }, { responsive: true });
+
+            // 8. Top Genres
+            Plotly.newPlot('plot-c8', [{
+                x: core.c8.map(d => d.Genre),
+                y: core.c8.map(d => d.Count),
+                type: 'bar',
+                marker: { color: '#8b5cf6' }
+            }], { ...DARK_THEME, title: 'Top 15 Most Common Genres', xaxis: { ...DARK_THEME.xaxis, tickangle: -35 } }, { responsive: true });
+
+            // 9. Update Frequency (Monthly)
+            Plotly.newPlot('plot-c9', [{
+                x: core.c9.map(d => d.Month),
+                y: core.c9.map(d => d.Count),
+                type: 'bar',
+                marker: { color: '#06b6d4' }
+            }], { ...DARK_THEME, title: 'Seasonality: Updates by Calendar Month' }, { responsive: true });
+
+            // 10. Paid vs Free Economics
+            Plotly.newPlot('plot-c10', [
+                {
+                    x: core.c10.map(d => d.Type),
+                    y: core.c10.map(d => d.Avg_Rating),
+                    name: 'Avg Rating',
+                    type: 'bar',
+                    marker: { color: '#3b82f6' }
+                },
+                {
+                    x: core.c10.map(d => d.Type),
+                    y: core.c10.map(d => d.Avg_Price),
+                    name: 'Avg Price ($)',
+                    type: 'bar',
+                    marker: { color: '#f59e0b' }
+                }
+            ], { ...DARK_THEME, barmode: 'group', title: 'Average Rating vs Price by Type' }, { responsive: true });
+        }
+
+        // Initialize on DOM load
+        window.addEventListener('DOMContentLoaded', () => {
+            toggleTimeOverride(); // set active button UI
+            renderAllPlots();
+            updateClock();
+            setInterval(updateClock, 1000);
+        });
+    </script>
 </body>
 </html>
